@@ -76,38 +76,6 @@ function tratarObjeto(objDados){
   return finalObject;
 }
 
-function returnStateDetailsCartIsOpen(){
-  const divContainerCarrinho = document.querySelector('.container-carrinho');
-  return divContainerCarrinho.classList.contains('aberto');
-}
-
-function openOrClosedDetailsCart(openOrClosed){
-  if (openOrClosed === 'open'){
-    divContainerCarrinho.classList.remove('fechado');
-    divContainerCarrinho.classList.add('aberto');
-    divListaProdutosCarrinho.classList.add('aberto')
-    if (+contadorItensCarrinho[0].innerHTML === 0){
-      divContainerBtnCarrinho.classList.add('aberto-sem-produtos');
-      divContainerBtnCarrinho.classList.remove('fechado')
-    } else{
-      divContainerBtnCarrinho.classList.add('aberto-com-produtos');
-      divContainerBtnCarrinho.classList.remove('fechado')
-    }
-
-  } else if (openOrClosed === 'close'){
-    divContainerCarrinho.classList.remove('aberto');
-    divListaProdutosCarrinho.classList.remove('aberto')
-    divContainerBtnCarrinho.classList.remove('aberto-sem-produtos');
-    divContainerBtnCarrinho.classList.remove('aberto-com-produtos');
-    divContainerCarrinho.classList.add('fechado');
-    divListaProdutosCarrinho.classList.add('fechado')
-    divContainerBtnCarrinho.classList.add('fechado');
-    divContainerBtnCarrinho.classList.add('fechado');
-  } else{
-    console.error('O argumento openOrClosed é inválido');
-  }
-}
-
 window.addEventListener('resize', function() {
   if (btnCarrinhoOtherDay.getBoundingClientRect().width <= 223){
     btnCarrinhoOtherDay.innerHTML = btnCarrinhoOtherDay.innerHTML.replace('Comprar para outro dia', 'Outro dia');
@@ -165,6 +133,38 @@ divCarrinhoFull.addEventListener('click', (event) =>{
   }
 })
 
+function returnStateDetailsCartIsOpen(){
+  const divContainerCarrinho = document.querySelector('.container-carrinho');
+  return divContainerCarrinho.classList.contains('aberto');
+}
+
+function openOrClosedDetailsCart(openOrClosed){
+  if (openOrClosed === 'open'){
+    divContainerCarrinho.classList.remove('fechado');
+    divContainerCarrinho.classList.add('aberto');
+    divListaProdutosCarrinho.classList.add('aberto')
+    if (+contadorItensCarrinho[0].innerHTML === 0){
+      divContainerBtnCarrinho.classList.add('aberto-sem-produtos');
+      divContainerBtnCarrinho.classList.remove('fechado')
+    } else{
+      divContainerBtnCarrinho.classList.add('aberto-com-produtos');
+      divContainerBtnCarrinho.classList.remove('fechado')
+    }
+
+  } else if (openOrClosed === 'close'){
+    divContainerCarrinho.classList.remove('aberto');
+    divListaProdutosCarrinho.classList.remove('aberto')
+    divContainerBtnCarrinho.classList.remove('aberto-sem-produtos');
+    divContainerBtnCarrinho.classList.remove('aberto-com-produtos');
+    divContainerCarrinho.classList.add('fechado');
+    divListaProdutosCarrinho.classList.add('fechado')
+    divContainerBtnCarrinho.classList.add('fechado');
+    divContainerBtnCarrinho.classList.add('fechado');
+  } else{
+    console.error('O argumento openOrClosed é inválido');
+  }
+}
+
 function contadorItens(operacao, valorItem, idItem, qtdeItemRemover){
   if (operacao === '+'){
     btnCarrinhoNext.removeAttribute('disabled');
@@ -181,6 +181,7 @@ function contadorItens(operacao, valorItem, idItem, qtdeItemRemover){
       btnCarrinhoNext.setAttribute('disabled','');
     }
   } else if (operacao === '-all'){
+    calcValueCart('-all', '', idItem, valorItem);
     contadorItensCarrinho.forEach(contador =>{
       contador.innerText = +contador.innerText - qtdeItemRemover;
     });
@@ -190,7 +191,7 @@ function contadorItens(operacao, valorItem, idItem, qtdeItemRemover){
   }
 }   
 
-function calcValueCart(operacao, valor, idItem){
+function calcValueCart(operacao, valor, idItem, valorTotal){
   const valorUnitario = +valor.replace(',','')/100;
   if (operacao === '+'){
     addOrRemoveItemDetailsCart('add', idItem);
@@ -205,8 +206,15 @@ function calcValueCart(operacao, valor, idItem){
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
       let valorFinal = valorAtual - valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    })
-  } else{
+    }) 
+  } else if (operacao === '-all'){
+    valorCarrinhos.forEach(valorCarrinho => {
+      let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
+      let valorFinal = valorAtual - valorTotal;
+      valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
+    }) 
+  }
+  else{
     console.error('Valor passado como operacao Inválida')
   }
 }
@@ -238,11 +246,11 @@ function removeItemListCart(idItem){
   const qtdeItenListCart = +document.querySelector(`.qtde-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('x','');
   const valorTotalItenListCart = +(document.querySelector(`.valor-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('R$', '').replace(',','').replace('.','')/100) * qtdeItenListCart;
   divListaProdutosCarrinho.removeChild(itenListCart);
-  if (divListaProdutosCarrinho.length === 0){
-    openOrClosedDetailsCart('close');
+  if (document.querySelectorAll('.produto-lista-carrinho').length === 0){
     divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
-  }
+  } 
   contadorItens('-all', valorTotalItenListCart, idItem, qtdeItenListCart);
+  transformButtonBuy(idItem, 'original');
 }
 
 function updateItemDetailsCart(idItem, operacao){
