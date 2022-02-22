@@ -14,6 +14,7 @@ const valorCarrinhos = document.querySelectorAll('.valor-carrinho');
 const spanNenhumProdutoListaCarrinho = document.querySelector('.nenhum-produto');
 const divContainerCorpoSite = document.querySelector('.container-corpo-site');
 const body = document.querySelector('body');
+let isClickedInIconRemoveItenList = false;
 let objReturnFetch = {};
 
 
@@ -119,19 +120,20 @@ window.addEventListener('resize', function() {
 window.addEventListener('scroll', function(){
   let distanciaDivCarrinhoTop = divDetailsCarrinho.getBoundingClientRect().top;
   let distanciaDivContainerBtnCarrinhoTop = divContainerBtnCarrinho.getBoundingClientRect().top;
+  let distanciaDivCarrinhoBotton = divDetailsCarrinho.getBoundingClientRect().bottom;
   if (distanciaDivCarrinhoTop <= -2){
     divCarrinhoFull.style.top = 0;
   }    
-  else if (distanciaDivContainerBtnCarrinhoTop >= 72){
+  else if (distanciaDivCarrinhoBotton >= 85){
     divCarrinhoFull.style.top = '-90px';
   }
 });
 
 body.addEventListener('click',(event)=> {
-  if(!event.target.classList.contains('details-carrinho')){
-    if( returnStateDetailsCartIsOpen()){
-      openOrClosedDetailsCart('close');
-    }
+  if(event.target.classList.contains('details-carrinho') || event.target.classList.contains('details-carrinho-full')){
+    return;
+  } else if (returnStateDetailsCartIsOpen()){
+    openOrClosedDetailsCart('close');
   }
 })
 
@@ -147,6 +149,7 @@ divListaProdutosCarrinho.addEventListener('click', (event) =>{
   openOrClosedDetailsCart('close');
 })
 
+
 divContainerBtnCarrinho.addEventListener('click', (event) =>{
   console.log(event.target);
   if (returnStateDetailsCartIsOpen() && event.target.classList.contains('container-btn-carrinho')){
@@ -154,7 +157,15 @@ divContainerBtnCarrinho.addEventListener('click', (event) =>{
   } 
 })
 
-function contadorItens(operacao, valorItem, idItem){
+divCarrinhoFull.addEventListener('click', (event) =>{
+  window.scrollTo(0, 345);
+  console.log(returnStateDetailsCartIsOpen());
+  if (!returnStateDetailsCartIsOpen()){
+    openOrClosedDetailsCart('open');
+  }
+})
+
+function contadorItens(operacao, valorItem, idItem, qtdeItemRemover){
   if (operacao === '+'){
     btnCarrinhoNext.removeAttribute('disabled');
     calcValueCart('+', valorItem, idItem);
@@ -169,6 +180,10 @@ function contadorItens(operacao, valorItem, idItem){
     if (+contadorItensCarrinho[0].innerText === 0){
       btnCarrinhoNext.setAttribute('disabled','');
     }
+  } else if (operacao === '-all'){
+    contadorItensCarrinho.forEach(contador =>{
+      contador.innerText = +contador.innerText - qtdeItemRemover;
+    });
   }  
   else{
     console.error('Valor passado como operacao Inválida')
@@ -208,9 +223,26 @@ function createAndInsertItemDetailsCart(idItem){
   <div class="container-qtde-e-valor-produto">
   <div class="qtde-produto-lista-produtos-carrinho" iditem="${idItem}">1x</div>
   <div class="valor-produto-lista-produtos-carrinho" iditem="${idItem}">${valorProduto}</div>
-  <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+  <svg class ="icon-excluir-item-lista-produtos-carrinho" iditem="${idItem}" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
   </div>`
   divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
+  const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
+  iconRemoveItemListCart.addEventListener('click', (event) =>{
+    removeItemListCart(idItem);
+  });
+}
+
+function removeItemListCart(idItem){
+  isClickedInIconRemoveItenList = true;
+  const itenListCart = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
+  const qtdeItenListCart = +document.querySelector(`.qtde-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('x','');
+  const valorTotalItenListCart = +(document.querySelector(`.valor-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('R$', '').replace(',','').replace('.','')/100) * qtdeItenListCart;
+  divListaProdutosCarrinho.removeChild(itenListCart);
+  if (divListaProdutosCarrinho.length === 0){
+    openOrClosedDetailsCart('close');
+    divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
+  }
+  contadorItens('-all', valorTotalItenListCart, idItem, qtdeItenListCart);
 }
 
 function updateItemDetailsCart(idItem, operacao){
@@ -348,20 +380,22 @@ function addEventsInCard(btnsComprar){
       //Verifica se clicou na label "Comprar"
       if (event.target.classList.contains('label-quantidade-produto') &&  event.target.innerText === 'Comprar'){
         transformButtonBuy(event.target.getAttribute('idItem'), 'twoButtons');
+        
       }  
       //Verifica se clicou no botão com a plavra "Comprar"
       if(event.target.classList.contains('btn-comprar-card') && event.target.classList.contains('isComprar')){
         transformButtonBuy(event.target.getAttribute('idItem'), 'twoButtons');
+        
       }
       //Subtrai a quantidade de itens do card, se for zerá-lo volta ele a forma original
       if (event.target.classList.contains('btn-subtrair')){
         subtrairQtdeItensCard(event.target.getAttribute('idItem'));
+        
       }  
       //Soma +1 na quantidade de itens do card
       if (event.target.classList.contains('btn-adicionar')){
         addQtdeItensCard(event.target.getAttribute('idItem'));
       }
-      
     })
   })
   showLoandigWindow(false);
