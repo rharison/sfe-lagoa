@@ -558,14 +558,22 @@ button {
   box-shadow: #d3d9df 0px 6px 17px;
   border-radius: 12px;
   background-color: #fff;
-  overflow: hidden;
   margin: 10px;
   justify-content: flex-end;
+  position: relative;
 }
 
-.card > img {
+.img-card {
   max-height: 190px;
   height: 100%;
+  border-radius: 13px 13px 0 0;
+}
+
+.img-imagem-mais-vendido {
+  position: absolute;
+  width: 100px;
+  top: -3.5px;
+  right: -3.4px;
 }
 
 .infos-card {

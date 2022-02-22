@@ -16,9 +16,7 @@ const divContainerCorpoSite = document.querySelector('.container-corpo-site');
 const body = document.querySelector('body');
 let objReturnFetch = {};
 
-console.log('Testando git')
 
-console.log('oi');
 async function newFetch(){
   try {
     showLoandigWindow(true);
@@ -45,9 +43,7 @@ async function newFetch(){
 }
 
 newFetch()
-.catch(erro => {
-  console.error('Erro: ' + erro);
-})
+
 
 function showLoandigWindow(isShow){
   const detailsCarrinhoFull = document.querySelector('.details-carrinho-full');
@@ -186,6 +182,9 @@ function contadorItens(operacao, valorItem, idItem, qtdeItemRemover){
     contadorItensCarrinho.forEach(contador =>{
       contador.innerText = +contador.innerText - qtdeItemRemover;
     });
+    if (+contadorItensCarrinho[0].innerText === 0){
+      btnCarrinhoNext.setAttribute('disabled','');
+    }
   }  
   else{
     console.error('Valor passado como operacao Inválida')
@@ -220,29 +219,41 @@ function calcValueCart(operacao, valor, idItem, valorTotal){
   }
 }
 
-function createAndInsertItemDetailsCart(idItem){ 
-  const nomeProduto = returnCurrentElementCard('nome-produto', idItem).innerText;
-  let valorProduto = returnCurrentElementCard('valor-produto', idItem).innerText;
-  valorProduto = (+valorProduto.replace(',','')/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
+function createAndInsertItemDetailsCart(idItem, type){ 
   const newProdutosListaCarrinho = document.createElement('div');
   newProdutosListaCarrinho.classList.add('produto-lista-carrinho')
   newProdutosListaCarrinho.setAttribute('iditem', idItem);
-  newProdutosListaCarrinho.innerHTML = 
-  `<div class="nome-produto-lista-produtos-carrinho" iditem="${idItem}">${nomeProduto}</div>
-  <div class="container-qtde-e-valor-produto">
-  <div class="qtde-produto-lista-produtos-carrinho" iditem="${idItem}">1x</div>
-  <div class="valor-produto-lista-produtos-carrinho" iditem="${idItem}">${valorProduto}</div>
-  <svg class ="icon-excluir-item-lista-produtos-carrinho" iditem="${idItem}" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-  </div>`
-  divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
-  const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
-  iconRemoveItemListCart.addEventListener('click', (event) =>{
-    removeItemListCart(idItem);
-  });
+  if (type === 'fromLocalStorage'){
+    console.log(divListaProdutosCarrinho);
+    console.log(spanNenhumProdutoListaCarrinho);
+    newProdutosListaCarrinho.innerHTML = localStorage.getItem(`itemLista[${idItem}]`);
+    divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
+    const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
+    iconRemoveItemListCart.addEventListener('click', (event) =>{
+      removeItemListCart(idItem);
+    });
+  }
+  if (type === 'new'){
+    const nomeProduto = returnCurrentElementCard('nome-produto', idItem).innerText;
+    let valorProduto = returnCurrentElementCard('valor-produto', idItem).innerText;
+    valorProduto = (+valorProduto.replace(',','')/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
+    newProdutosListaCarrinho.innerHTML = 
+    `<div class="nome-produto-lista-produtos-carrinho" iditem="${idItem}">${nomeProduto}</div>
+    <div class="container-qtde-e-valor-produto">
+    <div class="qtde-produto-lista-produtos-carrinho" iditem="${idItem}">1x</div>
+    <div class="valor-produto-lista-produtos-carrinho" iditem="${idItem}">${valorProduto}</div>
+    <svg class ="icon-excluir-item-lista-produtos-carrinho" iditem="${idItem}" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+    </div>`
+    divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
+    const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
+    iconRemoveItemListCart.addEventListener('click', (event) =>{
+      removeItemListCart(idItem);
+    });
+    localStorage.setItem(`itemLista[${idItem}]`, newProdutosListaCarrinho.innerHTML);
+  } 
 }
 
 function removeItemListCart(idItem){
-  isClickedInIconRemoveItenList = true;
   const itenListCart = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
   const qtdeItenListCart = +document.querySelector(`.qtde-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('x','');
   const valorTotalItenListCart = +(document.querySelector(`.valor-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('R$', '').replace(',','').replace('.','')/100) * qtdeItenListCart;
@@ -257,14 +268,17 @@ function removeItemListCart(idItem){
 function updateItemDetailsCart(idItem, operacao){
   const elementoProdutoLista = document.querySelector(`.produto-lista-carrinho[idItem="${idItem}"]`);
   const elementoQtdeAtualItem = document.querySelector(`.qtde-produto-lista-produtos-carrinho[idItem="${idItem}"]`);
+  const atualProdutoListaCarrinho = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
   let qtdeAtualItem = +elementoQtdeAtualItem.innerText.replace('x','');
   let qtdeFinalItem;
   if (operacao === '+'){
     qtdeFinalItem = qtdeAtualItem + 1;
     elementoQtdeAtualItem.innerText = `${qtdeFinalItem}x`;
+    localStorage.setItem(`itemLista[${idItem}]`, atualProdutoListaCarrinho.innerHTML);
   } else if (operacao === '-'){
     if (qtdeAtualItem === 1){
       divListaProdutosCarrinho.removeChild(elementoProdutoLista);
+      localStorage.removeItem(`itemLista[${idItem}]`);
       const produtosListaCarrinho = document.querySelectorAll('.produto-lista-carrinho');
       if (produtosListaCarrinho.length === 0){
         divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
@@ -272,6 +286,7 @@ function updateItemDetailsCart(idItem, operacao){
     } else {
       qtdeFinalItem = qtdeAtualItem - 1;
       elementoQtdeAtualItem.innerText = `${qtdeFinalItem}x`;
+      localStorage.setItem(`itemLista[${idItem}]`, atualProdutoListaCarrinho.innerHTML);
     }
   } else {
     console.error(`O parâmetro "operacao" informado é inválido | Parâmetro: ${opecarao}`)
@@ -288,8 +303,9 @@ function addOrRemoveItemDetailsCart(addOrRemove, idItem){
     if (possuiNaLista){
       updateItemDetailsCart(idItem, '+');
     } else {
-      createAndInsertItemDetailsCart(idItem)
+      createAndInsertItemDetailsCart(idItem, 'new');
     }
+
   } else if (addOrRemove === 'remove'){
     updateItemDetailsCart(idItem, '-');
   } else{
@@ -304,8 +320,13 @@ function createCard(containersCard){
       let newCard = document.createElement('div');
       newCard.classList.add('card');
       newCard.setAttribute('idgroup', item.grupos);
-      newCard.setAttribute('idItem', item.iditens);
-
+      newCard.setAttribute('idItem', item.iditens)
+      newCard.setAttribute('style', `order: ${item[item.grupos[0]]}`);
+      if (localStorage.getItem(item.iditens)){
+        newCard.innerHTML = localStorage.getItem(item.iditens);
+        divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho);
+        createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
+      } else { 
       //Tratando o valor do produto do card
       let valorOriginal = item.valorOriginal;
       const valorTarifarioAtual = item.tarifarios[0].valor;
@@ -337,10 +358,19 @@ function createCard(containersCard){
       } else{
         classeContemFaixaEtaria = 'inativo';
       }
-
+      let urlImgMaisVendido;
+      let classeMaisVendido;
+      if (item.idGroupMaisVendidos.length > 0){
+        urlImgMaisVendido = '/img/mais-vendido.png';
+        classeMaisVendido = 'img-imagem-mais-vendido'
+      } else{
+        urlImgMaisVendido = '';
+        classeMaisVendido = '';
+      }
 
       newCard.innerHTML =
       `<img src="${item.imagem}" alt="" class="img-card">
+      <img class="${classeMaisVendido}" src="${urlImgMaisVendido}">
         <div class="infos-card">
           <div class="container-descricao-card">
             <div class="container-nome-valor-produto-card">
@@ -375,6 +405,7 @@ function createCard(containersCard){
           </div>
         </div>
       </div>`
+    }
       container.appendChild(newCard);
     })
   })
@@ -389,17 +420,14 @@ function addEventsInCard(btnsComprar){
       //Verifica se clicou na label "Comprar"
       if (event.target.classList.contains('label-quantidade-produto') &&  event.target.innerText === 'Comprar'){
         transformButtonBuy(event.target.getAttribute('idItem'), 'twoButtons');
-        
       }  
       //Verifica se clicou no botão com a plavra "Comprar"
       if(event.target.classList.contains('btn-comprar-card') && event.target.classList.contains('isComprar')){
         transformButtonBuy(event.target.getAttribute('idItem'), 'twoButtons');
-        
       }
       //Subtrai a quantidade de itens do card, se for zerá-lo volta ele a forma original
       if (event.target.classList.contains('btn-subtrair')){
         subtrairQtdeItensCard(event.target.getAttribute('idItem'));
-        
       }  
       //Soma +1 na quantidade de itens do card
       if (event.target.classList.contains('btn-adicionar')){
@@ -422,8 +450,10 @@ if (versao === 'twoButtons'){
   btnClicado.classList.remove('isComprar');
   btnAddCart.classList.remove('isComprarBtn');
   btnSubCart.classList.remove('isComprarBtn');
+  addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
 } else if (versao === 'original'){
   labelQtdeProdutos.innerText = 'Comprar';
+  localStorage.removeItem(idItem);
   btnClicado.classList.add('isComprar');
   btnAddCart.classList.add('isComprarBtn');
   btnSubCart.classList.add('isComprarBtn');
@@ -440,6 +470,7 @@ if(+labelQtdeProdutos.innerText === 1){
   transformButtonBuy(idItem, 'original')
 } else{
   +labelQtdeProdutos.innerText--
+  localStorage.setItem(idItem, returnCurrentElementCard('card', idItem).innerHTML);
 }
 }
 
@@ -448,6 +479,7 @@ const valorItem = returnCurrentElementCard('valor-produto', idItem);
 contadorItens('+', valorItem.innerText, idItem);
 const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
 +labelQtdeProdutos.innerText++;
+addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
 }
 
 function returnCurrentElementCard(classe, idItem){
@@ -506,12 +538,8 @@ function createTabsAndContainerCards(arrayGroups){
   
 }
 
-
-
-
-
-
-
-
+function addInLocalStorage(idItem, elemento){
+  localStorage.setItem(idItem, elemento);
+}
 
 
