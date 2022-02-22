@@ -16,6 +16,8 @@ const divContainerCorpoSite = document.querySelector('.container-corpo-site');
 const body = document.querySelector('body');
 let objReturnFetch = {};
 
+console.log('Testando git')
+
 console.log('oi');
 async function newFetch(){
   try {
