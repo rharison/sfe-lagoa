@@ -14,7 +14,6 @@ const valorCarrinhos = document.querySelectorAll('.valor-carrinho');
 const spanNenhumProdutoListaCarrinho = document.querySelector('.nenhum-produto');
 const divContainerCorpoSite = document.querySelector('.container-corpo-site');
 const body = document.querySelector('body');
-let isClickedInIconRemoveItenList = false;
 let objReturnFetch = {};
 
 console.log('oi');
