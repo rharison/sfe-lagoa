@@ -198,6 +198,7 @@ function calcValueCart(operacao, valor, idItem){
 }
 
 function createAndInsertItemDetailsCart(idItem){
+  divListaProdutosCarrinho.innerText = '';
   const nomeProduto = returnCurrentElementCard('nome-produto', idItem).innerText;
   let valorProduto = returnCurrentElementCard('valor-produto', idItem).innerText;
   valorProduto = (+valorProduto.replace(',','')/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
@@ -230,6 +231,7 @@ function updateItemDetailsCart(idItem, operacao){
 
 function addOrRemoveItemDetailsCart(addOrRemove, idItem){
   if(addOrRemove === 'add'){
+    
     const produtosListaCarrinho = document.querySelectorAll('.produto-lista-carrinho');
     const possuiNaLista = Array.from(produtosListaCarrinho).some(produto => produto.getAttribute('iditem') === idItem);
     console.log(possuiNaLista);
