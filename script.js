@@ -11,6 +11,7 @@ const containerAllCards = document.querySelector('.cards');
 const url = `https://sofalta.eu/api/v4/empreendimentos/lagoa/produtos/ingressos/ingressos?data=2022-02-25`;
 const btnCarrinhoNext = document.querySelector('.btn-carrinho-next');
 const valorCarrinhos = document.querySelectorAll('.valor-carrinho');
+const spanNenhumProdutoListaCarrinho = document.querySelector('.nenhum-produto');
 const divContainerCorpoSite = document.querySelector('.container-corpo-site');
 const body = document.querySelector('body');
 let objReturnFetch = {};
@@ -180,9 +181,7 @@ function calcValueCart(operacao, valor, idItem){
     addOrRemoveItemDetailsCart('add', idItem);
     valorCarrinhos.forEach(valorCarrinho => {
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
-      //console.log(valorAtual);
       let valorFinal = valorAtual + valorUnitario;
-      //console.log(valorFinal);
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
     })
   } else if (operacao === '-'){
@@ -197,8 +196,7 @@ function calcValueCart(operacao, valor, idItem){
   }
 }
 
-function createAndInsertItemDetailsCart(idItem){
-  divListaProdutosCarrinho.innerText = '';
+function createAndInsertItemDetailsCart(idItem){ 
   const nomeProduto = returnCurrentElementCard('nome-produto', idItem).innerText;
   let valorProduto = returnCurrentElementCard('valor-produto', idItem).innerText;
   valorProduto = (+valorProduto.replace(',','')/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
@@ -216,32 +214,43 @@ function createAndInsertItemDetailsCart(idItem){
 }
 
 function updateItemDetailsCart(idItem, operacao){
+  const elementoProdutoLista = document.querySelector(`.produto-lista-carrinho[idItem="${idItem}"]`);
   const elementoQtdeAtualItem = document.querySelector(`.qtde-produto-lista-produtos-carrinho[idItem="${idItem}"]`);
-  let qtdeAtualItem = elementoQtdeAtualItem.innerText;
+  let qtdeAtualItem = +elementoQtdeAtualItem.innerText.replace('x','');
   let qtdeFinalItem;
   if (operacao === '+'){
-    qtdeFinalItem = +qtdeAtualItem.replace('x','') + 1;
+    qtdeFinalItem = qtdeAtualItem + 1;
     elementoQtdeAtualItem.innerText = `${qtdeFinalItem}x`;
   } else if (operacao === '-'){
-
+    if (qtdeAtualItem === 1){
+      divListaProdutosCarrinho.removeChild(elementoProdutoLista);
+      const produtosListaCarrinho = document.querySelectorAll('.produto-lista-carrinho');
+      if (produtosListaCarrinho.length === 0){
+        divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
+      }
+    } else {
+      qtdeFinalItem = qtdeAtualItem - 1;
+      elementoQtdeAtualItem.innerText = `${qtdeFinalItem}x`;
+    }
   } else {
     console.error(`O parâmetro "operacao" informado é inválido | Parâmetro: ${opecarao}`)
   }
 }
 
 function addOrRemoveItemDetailsCart(addOrRemove, idItem){
+  const produtosListaCarrinho = document.querySelectorAll('.produto-lista-carrinho');
+  const possuiNaLista = Array.from(produtosListaCarrinho).some(produto => produto.getAttribute('iditem') === idItem);
   if(addOrRemove === 'add'){
-    
-    const produtosListaCarrinho = document.querySelectorAll('.produto-lista-carrinho');
-    const possuiNaLista = Array.from(produtosListaCarrinho).some(produto => produto.getAttribute('iditem') === idItem);
-    console.log(possuiNaLista);
+    if (produtosListaCarrinho.length === 0){
+      divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho);
+    }
     if (possuiNaLista){
       updateItemDetailsCart(idItem, '+');
     } else {
       createAndInsertItemDetailsCart(idItem)
     }
   } else if (addOrRemove === 'remove'){
-    console.log('Remover item a lista do carrinho');
+    updateItemDetailsCart(idItem, '-');
   } else{
     console.error(`O argumento addOrRemove é inválido! - Argumento informado: ${addOrRemove}`);
   }
