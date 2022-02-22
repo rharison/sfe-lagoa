@@ -17,7 +17,7 @@ const body = document.querySelector('body');
 let isClickedInIconRemoveItenList = false;
 let objReturnFetch = {};
 
-
+console.log('oi');
 async function newFetch(){
   try {
     showLoandigWindow(true);
