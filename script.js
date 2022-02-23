@@ -13,6 +13,7 @@ const btnCarrinhoNext = document.querySelector('.btn-carrinho-next');
 const valorCarrinhos = document.querySelectorAll('.valor-carrinho');
 const spanNenhumProdutoListaCarrinho = document.querySelector('.nenhum-produto');
 const divContainerCorpoSite = document.querySelector('.container-corpo-site');
+const setasCarrinho = document.querySelectorAll('.seta-carrinho');
 const body = document.querySelector('body');
 let objReturnFetch = {};
 
@@ -137,6 +138,7 @@ function returnStateDetailsCartIsOpen(){
 
 function openOrClosedDetailsCart(openOrClosed){
   if (openOrClosed === 'open'){
+    setasCarrinho.forEach(seta => seta.style.animation = '0.4s 0s infinite alternate animacao-seta-carrinho-cima');
     divContainerCarrinho.classList.remove('fechado');
     divContainerCarrinho.classList.add('aberto');
     divListaProdutosCarrinho.classList.add('aberto')
@@ -149,6 +151,7 @@ function openOrClosedDetailsCart(openOrClosed){
     }
 
   } else if (openOrClosed === 'close'){
+    setasCarrinho.forEach(seta => seta.style.animation = '0.4s 0s infinite alternate animacao-seta-carrinho-baixo');
     divContainerCarrinho.classList.remove('aberto');
     divListaProdutosCarrinho.classList.remove('aberto')
     divContainerBtnCarrinho.classList.remove('aberto-sem-produtos');

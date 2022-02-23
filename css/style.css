@@ -408,8 +408,7 @@ button {
   display: flex;
   position: absolute;
   align-self: center;
-  animation: 0.4s 0s infinite alternate animacao-seta-carrinho;
-  transform: translateY(-5px);
+  animation: 0.4s 0s infinite alternate animacao-seta-carrinho-baixo;
 }
 
 .detail-botton-carrinho {
@@ -1004,12 +1003,22 @@ button {
   }
 }
 
-@keyframes animacao-seta-carrinho {
+@keyframes animacao-seta-carrinho-baixo {
   from {
     transform: translateY(-5px);
   }
 
   to {
     transform: translateY(-10px);
+  }
+}
+
+@keyframes animacao-seta-carrinho-cima {
+  from {
+    transform: translateY(-5px) rotate(180deg);
+  }
+
+  to {
+    transform: translateY(-10px) rotate(180deg);
   }
 }
