@@ -42,6 +42,7 @@ async function newFetch(){
     divContainerCorpoSite.style.height = '190px';
   }
 }
+
 newFetch()
 
 
@@ -223,7 +224,7 @@ function calcValueCart(operacao, valor, idItem, valorTotal){
   } else if (operacao === '-all'){
     valorCarrinhos.forEach(valorCarrinho => {
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
-      let valorFinal = valorAtual - valorTotal;
+      let valorFinal = valorAtual - +valorTotal.toFixed(2);
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
       valorFinal === 0 ? localStorage.removeItem('valorCarrinho') : localStorage.setItem('valorCarrinho', valorCarrinho.innerText);
     }) 
