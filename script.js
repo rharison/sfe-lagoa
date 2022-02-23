@@ -487,6 +487,7 @@ return document.querySelector(`.${classe}[idItem="${idItem}"]`);
 }
 
 function createTabsAndContainerCards(arrayGroups){
+  //Criando e adicionando os botões de navegação por tabs e setando o primeiro como o botão "ativo".
   arrayGroups.forEach((grupo, index) =>{
     let newButton = document.createElement('button');
     newButton.classList.add('btn-tab');
@@ -498,7 +499,7 @@ function createTabsAndContainerCards(arrayGroups){
     containerTabs.appendChild(newButton);
   })
 
-  
+  // Criando e adicionando os containers de cards de navegação por tabs e colocando o primeiro container como "Ativo";
   arrayGroups.forEach((grupo, index) => {
     const newContainer = document.createElement('div');
     newContainer.classList.add('container-cards');
@@ -511,7 +512,7 @@ function createTabsAndContainerCards(arrayGroups){
 
   const btnsNav = document.querySelectorAll('.btn-tab');
   const containersCard = document.querySelectorAll('.container-cards');
-  
+
   //Evento para navegação de tabs.
   btnsNav.forEach((btn) =>{
     btn.addEventListener('click', () =>{
@@ -522,20 +523,17 @@ function createTabsAndContainerCards(arrayGroups){
       })
       btn.classList.add('btn-ativo');
       const idGroupBtn = btn.getAttribute('idgroup');
-      
-
       containersCard.forEach(container => {
-        const idGroupContainer = container.getAttribute('idgroup');
-        if (container.classList.contains('container-cards-ativo')){
-          container.classList.remove('container-cards-ativo');
-        } else if (idGroupBtn === idGroupContainer){
-          container.classList.add('container-cards-ativo');
-        }
+      const idGroupContainer = container.getAttribute('idgroup');
+      if (container.classList.contains('container-cards-ativo') && idGroupContainer != idGroupBtn){
+        container.classList.remove('container-cards-ativo');
+      } else if (idGroupBtn === idGroupContainer){
+        container.classList.add('container-cards-ativo');
+      }
       })   
     })
   })
   createCard(containersCard);
-  
 }
 
 function addInLocalStorage(idItem, elemento){
