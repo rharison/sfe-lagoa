@@ -168,50 +168,68 @@ function contadorItens(operacao, valorItem, idItem, qtdeItemRemover){
     calcValueCart('+', valorItem, idItem);
     contadorItensCarrinho.forEach(contador =>{
       +contador.innerText ++;
+      localStorage.setItem('contadorItem',  +contador.innerText);
     })
   } else if (operacao === '-') {
     calcValueCart('-', valorItem, idItem);
     contadorItensCarrinho.forEach(contador =>{
       +contador.innerText --;
+      localStorage.setItem('contadorItem',  +contador.innerText);
     })
     if (+contadorItensCarrinho[0].innerText === 0){
       btnCarrinhoNext.setAttribute('disabled','');
+      localStorage.removeItem('contadorItem');
     }
   } else if (operacao === '-all'){
     calcValueCart('-all', '', idItem, valorItem);
     contadorItensCarrinho.forEach(contador =>{
       contador.innerText = +contador.innerText - qtdeItemRemover;
+      localStorage.setItem('contadorItem',  +contador.innerText);
     });
     if (+contadorItensCarrinho[0].innerText === 0){
       btnCarrinhoNext.setAttribute('disabled','');
+      localStorage.removeItem('contadorItem');
     }
-  }  
+  } else if (operacao === 'fromLocalStorage'){
+    contadorItensCarrinho.forEach(contador =>{
+      contador.innerText = localStorage.getItem('contadorItem');
+    });
+    calcValueCart('fromLocalStorage');
+  }
   else{
     console.error('Valor passado como operacao Inválida')
   }
 }   
 
 function calcValueCart(operacao, valor, idItem, valorTotal){
-  const valorUnitario = +valor.replace(',','')/100;
   if (operacao === '+'){
+    const valorUnitario = +valor.replace(',','')/100;
     addOrRemoveItemDetailsCart('add', idItem);
     valorCarrinhos.forEach(valorCarrinho => {
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
       let valorFinal = valorAtual + valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
+      localStorage.setItem('valorCarrinho', valorCarrinho.innerText);
     })
   } else if (operacao === '-'){
+    const valorUnitario = +valor.replace(',','')/100;
     addOrRemoveItemDetailsCart('remove', idItem);
     valorCarrinhos.forEach(valorCarrinho => {
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
       let valorFinal = valorAtual - valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
+      valorFinal === 0 ? localStorage.removeItem('valorCarrinho') : localStorage.setItem('valorCarrinho', valorCarrinho.innerText);
     }) 
   } else if (operacao === '-all'){
     valorCarrinhos.forEach(valorCarrinho => {
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
       let valorFinal = valorAtual - valorTotal;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
+      valorFinal === 0 ? localStorage.removeItem('valorCarrinho') : localStorage.setItem('valorCarrinho', valorCarrinho.innerText);
+    }) 
+  } else if ('fromLocalStorage') {
+    valorCarrinhos.forEach(valorCarrinho => {
+      valorCarrinho.innerText = localStorage.getItem('valorCarrinho');
     }) 
   }
   else{
@@ -224,8 +242,6 @@ function createAndInsertItemDetailsCart(idItem, type){
   newProdutosListaCarrinho.classList.add('produto-lista-carrinho')
   newProdutosListaCarrinho.setAttribute('iditem', idItem);
   if (type === 'fromLocalStorage'){
-    console.log(divListaProdutosCarrinho);
-    console.log(spanNenhumProdutoListaCarrinho);
     newProdutosListaCarrinho.innerHTML = localStorage.getItem(`itemLista[${idItem}]`);
     divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
     const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
@@ -327,6 +343,7 @@ function createCard(containersCard){
         newCard.innerHTML = localStorage.getItem(item.iditens);
         divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho);
         createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
+        contadorItens('fromLocalStorage');
       } else { 
       //Tratando o valor do produto do card
       let valorOriginal = item.valorOriginal;
