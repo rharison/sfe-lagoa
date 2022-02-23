@@ -262,6 +262,7 @@ function removeItemListCart(idItem){
     divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
   } 
   contadorItens('-all', valorTotalItenListCart, idItem, qtdeItenListCart);
+  localStorage.removeItem(`itemLista[${idItem}]`);
   transformButtonBuy(idItem, 'original');
 }
 
