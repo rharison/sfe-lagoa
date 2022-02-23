@@ -198,41 +198,37 @@ function contadorItens(operacao, valorItem, idItem, qtdeItemRemover, qtdeItemAdi
 }   
 
 function calcValueCart(operacao, valor, idItem, valorTotal){
-  if (operacao === '+'){
-    const valorUnitario = +valor.replace(',','')/100;
-    addOrRemoveItemDetailsCart('add', idItem);
-    valorCarrinhos.forEach(valorCarrinho => {
-      let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
-      let valorFinal = valorAtual + valorUnitario;
+  let addOrRemoveParametro;
+  let valorUnitario;
+  valorCarrinhos.forEach(valorCarrinho =>{
+    const valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
+    let valorFinal;
+    if (operacao === '+') {
+      valorUnitario = +valor.replace(',','')/100;
+      addOrRemoveParametro = 'add';
+      valorFinal = valorAtual + valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    })
-  } else if (operacao === '-'){
-    const valorUnitario = +valor.replace(',','')/100;
-    addOrRemoveItemDetailsCart('remove', idItem);
-    valorCarrinhos.forEach(valorCarrinho => {
-      let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
-      let valorFinal = valorAtual - valorUnitario;
+    } else if (operacao === '-') {
+      valorUnitario = +valor.replace(',','')/100;
+      addOrRemoveParametro = 'remove';
+      valorFinal = valorAtual - valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    }) 
-  } else if (operacao === '-all'){
-    valorCarrinhos.forEach(valorCarrinho => {
-      let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
-      let valorFinal = valorAtual - +valorTotal.toFixed(2);
+    } else if (operacao === '-all'){
+      valorFinal = valorAtual - +valorTotal.toFixed(2);
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    }) 
-  } else if ('fromLocalStorage') {
-    valorCarrinhos.forEach(valorCarrinho => {
-      let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
-      let valorFinal = valorAtual + valor;
+    } else if (operacao === 'fromLocalStorage') {
+      valorFinal = valorAtual + valor;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    }) 
-
-    console.log(valor);
+    } else{
+      console.error('Valor passado como operacao Inválida')
+    }
+  })
+  if (addOrRemoveParametro === 'add'){
+    addOrRemoveItemDetailsCart(addOrRemoveParametro, idItem);
+  } else if (addOrRemoveParametro === 'remove'){
+    addOrRemoveItemDetailsCart(addOrRemoveParametro, idItem);
   }
-  else{
-    console.error('Valor passado como operacao Inválida')
-  }
-}
+} 
 
 function createAndInsertItemDetailsCart(idItem, type){ 
   const newProdutosListaCarrinho = document.createElement('div');
