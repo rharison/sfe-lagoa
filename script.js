@@ -116,7 +116,6 @@ divListaProdutosCarrinho.addEventListener('click', (event) =>{
 
 
 divContainerBtnCarrinho.addEventListener('click', (event) =>{
-  console.log(event.target);
   if (returnStateDetailsCartIsOpen() && event.target.classList.contains('container-btn-carrinho')){
     openOrClosedDetailsCart('close');
   } 
@@ -124,7 +123,6 @@ divContainerBtnCarrinho.addEventListener('click', (event) =>{
 
 divCarrinhoFull.addEventListener('click', (event) =>{
   window.scrollTo(0, 345);
-  console.log(returnStateDetailsCartIsOpen());
   if (!returnStateDetailsCartIsOpen()){
     openOrClosedDetailsCart('open');
   }
@@ -481,7 +479,7 @@ if (versao === 'twoButtons'){
   btnAddCart.classList.add('isComprarBtn');
   btnSubCart.classList.add('isComprarBtn');
 } else {
-  console.log('Erro: segundo parametro "versao" inválido');
+  console.error('Erro: segundo parametro "versao" inválido');
 }
 }
 
