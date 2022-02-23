@@ -43,7 +43,7 @@ async function newFetch(){
   }
 }
 
-newFetch()
+newFetch();
 
 
 function showLoandigWindow(isShow){
@@ -163,39 +163,34 @@ function openOrClosedDetailsCart(openOrClosed){
   }
 }
 
-function contadorItens(operacao, valorItem, idItem, qtdeItemRemover){
+function contadorItens(operacao, valorItem, idItem, qtdeItemRemover, qtdeItemAdiconar){
   if (operacao === '+'){
     btnCarrinhoNext.removeAttribute('disabled');
     calcValueCart('+', valorItem, idItem);
     contadorItensCarrinho.forEach(contador =>{
       +contador.innerText ++;
-      localStorage.setItem('contadorItem',  +contador.innerText);
     })
   } else if (operacao === '-') {
     calcValueCart('-', valorItem, idItem);
     contadorItensCarrinho.forEach(contador =>{
       +contador.innerText --;
-      localStorage.setItem('contadorItem',  +contador.innerText);
     })
     if (+contadorItensCarrinho[0].innerText === 0){
       btnCarrinhoNext.setAttribute('disabled','');
-      localStorage.removeItem('contadorItem');
     }
   } else if (operacao === '-all'){
     calcValueCart('-all', '', idItem, valorItem);
     contadorItensCarrinho.forEach(contador =>{
       contador.innerText = +contador.innerText - qtdeItemRemover;
-      localStorage.setItem('contadorItem',  +contador.innerText);
     });
     if (+contadorItensCarrinho[0].innerText === 0){
       btnCarrinhoNext.setAttribute('disabled','');
-      localStorage.removeItem('contadorItem');
     }
   } else if (operacao === 'fromLocalStorage'){
     contadorItensCarrinho.forEach(contador =>{
-      contador.innerText = localStorage.getItem('contadorItem');
+      contador.innerText = +contador.innerText + qtdeItemAdiconar;
     });
-    calcValueCart('fromLocalStorage');
+    calcValueCart('fromLocalStorage', valorItem*qtdeItemAdiconar, idItem);
   }
   else{
     console.error('Valor passado como operacao Inválida')
@@ -210,7 +205,6 @@ function calcValueCart(operacao, valor, idItem, valorTotal){
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
       let valorFinal = valorAtual + valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-      localStorage.setItem('valorCarrinho', valorCarrinho.innerText);
     })
   } else if (operacao === '-'){
     const valorUnitario = +valor.replace(',','')/100;
@@ -219,19 +213,21 @@ function calcValueCart(operacao, valor, idItem, valorTotal){
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
       let valorFinal = valorAtual - valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-      valorFinal === 0 ? localStorage.removeItem('valorCarrinho') : localStorage.setItem('valorCarrinho', valorCarrinho.innerText);
     }) 
   } else if (operacao === '-all'){
     valorCarrinhos.forEach(valorCarrinho => {
       let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
       let valorFinal = valorAtual - +valorTotal.toFixed(2);
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-      valorFinal === 0 ? localStorage.removeItem('valorCarrinho') : localStorage.setItem('valorCarrinho', valorCarrinho.innerText);
     }) 
   } else if ('fromLocalStorage') {
     valorCarrinhos.forEach(valorCarrinho => {
-      valorCarrinho.innerText = localStorage.getItem('valorCarrinho');
+      let valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
+      let valorFinal = valorAtual + valor;
+      valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
     }) 
+
+    console.log(valor);
   }
   else{
     console.error('Valor passado como operacao Inválida')
@@ -334,20 +330,22 @@ function addOrRemoveItemDetailsCart(addOrRemove, idItem){
   }
 }
 
+
 function createCard(containersCard){
   const objTratatdo = tratarObjeto(objReturnFetch);
   containersCard.forEach(container => {
-    objTratatdo[container.getAttribute('idgroup')].forEach((item, index) =>{
+    objTratatdo[container.getAttribute('idgroup')].forEach((item) =>{
       let newCard = document.createElement('div');
       newCard.classList.add('card');
       newCard.setAttribute('idgroup', item.grupos);
       newCard.setAttribute('idItem', item.iditens)
       newCard.setAttribute('style', `order: ${item[item.grupos[0]]}`);
-      if (localStorage.getItem(item.iditens)){
-        Array.from(divListaProdutosCarrinho.childNodes).some(child => child.classList.contains('nenhum-produto')) ? divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho) : false
-        newCard.innerHTML = localStorage.getItem(item.iditens);       
+
+      if (localStorage.getItem(item.iditens) && !(localStorage.getItem(item.iditens) === "") && !(localStorage.getItem(`itemLista[${item.iditens}]`) === "")){
+        Array.from(divListaProdutosCarrinho.childNodes).some(child => child.classList.contains('nenhum-produto')) ? divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho) : false;
+        newCard.innerHTML = localStorage.getItem(item.iditens);
         createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
-        contadorItens('fromLocalStorage');
+        contadorItens('fromLocalStorage', +newCard.querySelector('.valor-produto').innerText.replace(',', '.'),item.iditens,'',+newCard.querySelector('.label-quantidade-produto').innerText);
       } else { 
       //Tratando o valor do produto do card
       let valorOriginal = item.valorOriginal;
