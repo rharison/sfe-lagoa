@@ -42,7 +42,6 @@ async function newFetch(){
     divContainerCorpoSite.style.height = '190px';
   }
 }
-
 newFetch()
 
 
@@ -265,21 +264,24 @@ function createAndInsertItemDetailsCart(idItem, type){
     </div>`
     divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
     const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
-    iconRemoveItemListCart.addEventListener('click', (event) =>{
-      removeItemListCart(idItem);
+    iconRemoveItemListCart.addEventListener('click', function(event){
+      removeItemListCart(idItem, event);
     });
     localStorage.setItem(`itemLista[${idItem}]`, newProdutosListaCarrinho.innerHTML);
   } 
 }
 
-function removeItemListCart(idItem){
+function removeItemListCart(idItem, event){
   const itenListCart = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
   const qtdeItenListCart = +document.querySelector(`.qtde-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('x','');
   const valorTotalItenListCart = +(document.querySelector(`.valor-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('R$', '').replace(',','').replace('.','')/100) * qtdeItenListCart;
   divListaProdutosCarrinho.removeChild(itenListCart);
   if (document.querySelectorAll('.produto-lista-carrinho').length === 0){
     divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
-  } 
+  } else{
+    event.stopPropagation();
+    openOrClosedDetailsCart('open');
+  }
   contadorItens('-all', valorTotalItenListCart, idItem, qtdeItenListCart);
   localStorage.removeItem(`itemLista[${idItem}]`);
   transformButtonBuy(idItem, 'original');
