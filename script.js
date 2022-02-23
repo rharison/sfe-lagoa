@@ -333,15 +333,15 @@ function addOrRemoveItemDetailsCart(addOrRemove, idItem){
 function createCard(containersCard){
   const objTratatdo = tratarObjeto(objReturnFetch);
   containersCard.forEach(container => {
-    objTratatdo[container.getAttribute('idgroup')].forEach(item =>{
+    objTratatdo[container.getAttribute('idgroup')].forEach((item, index) =>{
       let newCard = document.createElement('div');
       newCard.classList.add('card');
       newCard.setAttribute('idgroup', item.grupos);
       newCard.setAttribute('idItem', item.iditens)
       newCard.setAttribute('style', `order: ${item[item.grupos[0]]}`);
       if (localStorage.getItem(item.iditens)){
-        newCard.innerHTML = localStorage.getItem(item.iditens);
-        divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho);
+        Array.from(divListaProdutosCarrinho.childNodes).some(child => child.classList.contains('nenhum-produto')) ? divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho) : false
+        newCard.innerHTML = localStorage.getItem(item.iditens);       
         createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
         contadorItens('fromLocalStorage');
       } else { 
