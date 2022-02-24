@@ -46,9 +46,7 @@ async function newFetch(){
 function showLoandigWindow(isShow){
   const detailsCarrinhoFull = document.querySelector('.details-carrinho-full');
   const containerBody = document.querySelector('.container-corpo-site');
-  const containerHeader = document.querySelector('.container-header');
   const loader = document.querySelector('.loader');
-
   if (isShow){
     detailsCarrinhoFull.style.opacity = '0';
     containerBody.style.opacity = "0";
