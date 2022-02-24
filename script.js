@@ -17,14 +17,14 @@ const setasCarrinho = document.querySelectorAll('.seta-carrinho');
 const body = document.querySelector('body');
 let objReturnFetch = {};
 
+newFetch();
 
 async function newFetch(){
   try {
     showLoandigWindow(true);
     let response = await fetch(url);
     if (!response.ok) {
-      console.error('HTTP error! status: ' + response.status);
-      newFetch()
+      console.error('HTTP error! status: ' + response.status)
       .catch(erro => {
       console.error('Erro: ' + erro);
       })
@@ -42,9 +42,6 @@ async function newFetch(){
     divContainerCorpoSite.style.height = '190px';
   }
 }
-
-newFetch();
-
 
 function showLoandigWindow(isShow){
   const detailsCarrinhoFull = document.querySelector('.details-carrinho-full');
