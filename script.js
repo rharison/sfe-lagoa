@@ -223,7 +223,6 @@ function updateItemDetailsCart(idItem, operacao){
   const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
   const elementoProdutoLista = document.querySelector(`.produto-lista-carrinho[idItem="${idItem}"]`);
   const elementoQtdeAtualItem = document.querySelector(`.qtde-produto-lista-produtos-carrinho[idItem="${idItem}"]`);
-  const atualProdutoListaCarrinho = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
   let qtdeAtualItem = +elementoQtdeAtualItem.innerText.replace('x','');
   let qtdeFinalItem;
   if (operacao === '+'){
