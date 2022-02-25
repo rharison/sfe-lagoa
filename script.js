@@ -252,20 +252,10 @@ function addOrRemoveItemDetailsCart(addOrRemove, idItem){
   const produtosListaCarrinho = document.querySelectorAll('.produto-lista-carrinho');
   const possuiNaLista = Array.from(produtosListaCarrinho).some(produto => produto.getAttribute('iditem') === idItem);
   if(addOrRemove === 'add'){
-    if (produtosListaCarrinho.length === 0){
-      divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho);
-    }
-    if (possuiNaLista){
-      updateItemDetailsCart(idItem, '+');
-    } else {
-      createAndInsertItemDetailsCart(idItem, 'new');
-    }
-
-  } else if (addOrRemove === 'remove'){
-    updateItemDetailsCart(idItem, '-');
-  } else{
-    console.error(`O argumento addOrRemove é inválido! - Argumento informado: ${addOrRemove}`);
-  }
+    if (produtosListaCarrinho.length === 0) divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho);
+    possuiNaLista ? updateItemDetailsCart(idItem, '+') : createAndInsertItemDetailsCart(idItem, 'new');
+  } 
+  if (addOrRemove === 'remove') updateItemDetailsCart(idItem, '-');
 }
 
 
