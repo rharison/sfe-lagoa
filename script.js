@@ -69,7 +69,7 @@ window.addEventListener('scroll', function(){
 });
 
 body.addEventListener('click',(event)=> {
-  if(event.target.classList.contains('details-carrinho') || event.target.classList.contains('details-carrinho-full')){
+   if(event.target.classList.contains('details-carrinho') || event.target.classList.contains('details-carrinho-full') || event.target.classList.contains('btn-carrinho')) {
     return;
   } 
   if (returnStateDetailsCartIsOpen()){
@@ -80,12 +80,6 @@ body.addEventListener('click',(event)=> {
 divDetailsCarrinho.addEventListener('click', () =>{
   const openOrClosed = returnStateDetailsCartIsOpen() ? 'close' : 'open';
   openOrClosedDetailsCart(openOrClosed);
-})
-
-divContainerBtnCarrinho.addEventListener('click', (event) =>{
-  if (returnStateDetailsCartIsOpen() && event.target.classList.contains('container-btn-carrinho')){
-    openOrClosedDetailsCart('close');
-  } 
 })
 
 divCarrinhoFull.addEventListener('click', (event) =>{
