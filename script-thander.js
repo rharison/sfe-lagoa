@@ -2,11 +2,13 @@ const divCarrinhoFull = document.querySelector('.details-carrinho-full');
 const divDetailsCarrinho = document.querySelector('.details-carrinho');
 const divContainerCarrinho = document.querySelector('.container-carrinho');
 const divContainerBtnCarrinho = document.querySelector('.container-btn-carrinho');
+const btnCarrinhoOtherDay = document.querySelector ('.btn-carrinho-buy-other-day');
 const divListaProdutosCarrinho = document.querySelector('.lista-produtos-carrinho');
 const contadorItensCarrinho = document.querySelectorAll('.contador-carrinho');
 const containerCards = document.querySelector('.container-cards');
 const containerTabs = document.querySelector('.container-nav-tabs');
 const containerAllCards = document.querySelector('.cards');
+const url = `https://sofalta.eu/api/v4/empreendimentos/lagoa/produtos/ingressos/ingressos?data=2022-02-25`;
 const btnCarrinhoNext = document.querySelector('.btn-carrinho-next');
 const valorCarrinhos = document.querySelectorAll('.valor-carrinho');
 const spanNenhumProdutoListaCarrinho = document.querySelector('.nenhum-produto');
@@ -15,42 +17,58 @@ const setasCarrinho = document.querySelectorAll('.seta-carrinho');
 const body = document.querySelector('body');
 let objReturnFetch = {};
 
-newFetch();
 
 async function newFetch(){
   try {
-    const url = `https://sofalta.eu/api/v4/empreendimentos/lagoa/produtos/ingressos/ingressos?data=2022-02-25`;
+    showLoandigWindow(true);
     let response = await fetch(url);
+    console.log(response)
     if (!response.ok) {
-      console.error('HTTP error! status: ' + response.status)
+      console.error('HTTP error! status: ' + response.status);
+      //qual nome de quando chama a mesma função dentro dela msm
+      newFetch()
+      console.log('jamil')
       .catch(erro => {
       console.error('Erro: ' + erro);
       })
     }
-   
+
     objReturnFetch = await response.json();
     createTabsAndContainerCards(objReturnFetch.grupos);
+    //Qual motivo de uso dessa função?
     tratarObjeto(objReturnFetch);
-    
+
   }
   catch(erro){
     console.error('Erro : ' + erro);
-    hiddenLoandigWindow()
+    showLoandigWindow(false);
     divContainerCorpoSite.innerText = 'Erro no servidor! Tente recarregar a página';
     divContainerCorpoSite.style.height = '190px';
   }
 }
 
-function hiddenLoandigWindow(){
-  document.querySelector('.details-carrinho-full').style.opacity = '1';
-  document.querySelector('.container-corpo-site').style.opacity = '1';
-  document.querySelector('.loader').style.display = "none";
+newFetch();
+
+
+function showLoandigWindow(isShow){
+  const detailsCarrinhoFull = document.querySelector('.details-carrinho-full');
+  const containerBody = document.querySelector('.container-corpo-site');
+  const containerHeader = document.querySelector('.container-header');//não esta usando essa variavel
+  const loader = document.querySelector('.loader');
+
+  //refatorar
+  if (isShow){
+    detailsCarrinhoFull.style.opacity = '0';
+    containerBody.style.opacity = "0";
+  } else {
+    loader.style.display = "none";
+  }
 }
 
 function tratarObjeto(objDados){
   let finalObject = {};
   objDados.grupos.forEach((grupo) =>{
-   const newObj = {[grupo.id]:objDados.itens.filter(item => 
+   const newObj = {[grupo.id]:objDados.itens.filter(item =>
       item.grupos.some(group => group === grupo.id)
     )};
     Object.assign(finalObject, newObj);
@@ -60,17 +78,23 @@ function tratarObjeto(objDados){
 }
 
 window.addEventListener('resize', function() {
-  const btnCarrinhoOtherDay = document.querySelector ('.btn-carrinho-buy-other-day');
-  btnCarrinhoOtherDay.getBoundingClientRect().width <= 223 ? btnCarrinhoOtherDay.innerText = 'Outro dia' : btnCarrinhoOtherDay.innerText = 'Comprar para outro dia';
+  //Refatorar - Deixar padrão
+  if (btnCarrinhoOtherDay.getBoundingClientRect().width <= 223){
+    btnCarrinhoOtherDay.innerHTML = btnCarrinhoOtherDay.innerHTML.replace('Comprar para outro dia', 'Outro dia');
+  }
+  else if (btnCarrinhoOtherDay.getBoundingClientRect().width > 223){
+    btnCarrinhoOtherDay.innerHTML = btnCarrinhoOtherDay.innerHTML.replace('Outro dia', 'Comprar para outro dia');
+  }
 });
+
 
 window.addEventListener('scroll', function(){
   let distanciaDivCarrinhoTop = divDetailsCarrinho.getBoundingClientRect().top;
-  let distanciaDivContainerBtnCarrinhoTop = divContainerBtnCarrinho.getBoundingClientRect().top;
+  let distanciaDivContainerBtnCarrinhoTop = divContainerBtnCarrinho.getBoundingClientRect().top;//por que foi criado essa variavel se não usa?
   let distanciaDivCarrinhoBotton = divDetailsCarrinho.getBoundingClientRect().bottom;
   if (distanciaDivCarrinhoTop <= -2){
     divCarrinhoFull.style.top = 0;
-  }    
+  }
   else if (distanciaDivCarrinhoBotton >= 85){
     divCarrinhoFull.style.top = '-90px';
   }
@@ -100,7 +124,7 @@ divListaProdutosCarrinho.addEventListener('click', (event) =>{
 divContainerBtnCarrinho.addEventListener('click', (event) =>{
   if (returnStateDetailsCartIsOpen() && event.target.classList.contains('container-btn-carrinho')){
     openOrClosedDetailsCart('close');
-  } 
+  }
 })
 
 divCarrinhoFull.addEventListener('click', (event) =>{
@@ -116,6 +140,7 @@ function returnStateDetailsCartIsOpen(){
 }
 
 function openOrClosedDetailsCart(openOrClosed){
+  //refatorar
   if (openOrClosed === 'open'){
     setasCarrinho.forEach(seta => seta.style.animation = '0.4s 0s infinite alternate animacao-seta-carrinho-cima');
     divContainerCarrinho.classList.remove('fechado');
@@ -139,16 +164,20 @@ function openOrClosedDetailsCart(openOrClosed){
     divListaProdutosCarrinho.classList.add('fechado')
     divContainerBtnCarrinho.classList.add('fechado');
     divContainerBtnCarrinho.classList.add('fechado');
+    
   } else{
     console.error('O argumento openOrClosed é inválido');
   }
 }
 
 function contadorItens(operacao, valorItem, idItem, qtdeItemRemover, qtdeItemAdiconar){
+  //poderia ser substituido por um switch
   if (operacao === '+'){
     btnCarrinhoNext.removeAttribute('disabled');
     calcValueCart('+', valorItem, idItem);
+
     contadorItensCarrinho.forEach(contador =>{
+      console.log(contador)
       +contador.innerText ++;
     })
   } else if (operacao === '-') {
@@ -176,7 +205,8 @@ function contadorItens(operacao, valorItem, idItem, qtdeItemRemover, qtdeItemAdi
   else{
     console.error('Valor passado como operacao Inválida')
   }
-}   
+  // console.log(contadorItensCarrinho)
+}
 
 function calcValueCart(operacao, valor, idItem, valorTotal){
   let addOrRemoveParametro;
@@ -184,6 +214,7 @@ function calcValueCart(operacao, valor, idItem, valorTotal){
   valorCarrinhos.forEach(valorCarrinho =>{
     const valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
     let valorFinal;
+    //susbstituir por switch e melhorar otmizar o codigo
     if (operacao === '+') {
       valorUnitario = +valor.replace(',','')/100;
       addOrRemoveParametro = 'add';
@@ -203,15 +234,18 @@ function calcValueCart(operacao, valor, idItem, valorTotal){
     } else{
       console.error('Valor passado como operacao Inválida')
     }
+
   })
+  //por que do if else?
+
   if (addOrRemoveParametro === 'add'){
     addOrRemoveItemDetailsCart(addOrRemoveParametro, idItem);
   } else if (addOrRemoveParametro === 'remove'){
     addOrRemoveItemDetailsCart(addOrRemoveParametro, idItem);
   }
-} 
+}
 
-function createAndInsertItemDetailsCart(idItem, type){ 
+function createAndInsertItemDetailsCart(idItem, type){
   const newProdutosListaCarrinho = document.createElement('div');
   newProdutosListaCarrinho.classList.add('produto-lista-carrinho')
   newProdutosListaCarrinho.setAttribute('iditem', idItem);
@@ -227,7 +261,7 @@ function createAndInsertItemDetailsCart(idItem, type){
     const nomeProduto = returnCurrentElementCard('nome-produto', idItem).innerText;
     let valorProduto = returnCurrentElementCard('valor-produto', idItem).innerText;
     valorProduto = (+valorProduto.replace(',','')/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
-    newProdutosListaCarrinho.innerHTML = 
+    newProdutosListaCarrinho.innerHTML =
     `<div class="nome-produto-lista-produtos-carrinho" iditem="${idItem}">${nomeProduto}</div>
     <div class="container-qtde-e-valor-produto">
     <div class="qtde-produto-lista-produtos-carrinho" iditem="${idItem}">1x</div>
@@ -239,10 +273,11 @@ function createAndInsertItemDetailsCart(idItem, type){
     iconRemoveItemListCart.addEventListener('click', function(event){
       removeItemListCart(idItem, event);
     });
+    //salvar como objeto
     localStorage.setItem(`itemLista[${idItem}]`, newProdutosListaCarrinho.innerHTML);
-  } 
+  }
 }
-
+//Verificar os parametros recebidos, onde chama ta tudo de acordo
 function removeItemListCart(idItem, event){
   const itenListCart = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
   const qtdeItenListCart = +document.querySelector(`.qtde-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('x','');
@@ -319,11 +354,12 @@ function createCard(containersCard){
       newCard.setAttribute('style', `order: ${item[item.grupos[0]]}`);
 
       if (localStorage.getItem(item.iditens) && !(localStorage.getItem(item.iditens) === "") && !(localStorage.getItem(`itemLista[${item.iditens}]`) === "")){
+        //Talvez com if ficaria mais legivel
         Array.from(divListaProdutosCarrinho.childNodes).some(child => child.classList.contains('nenhum-produto')) ? divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho) : false;
         newCard.innerHTML = localStorage.getItem(item.iditens);
         createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
         contadorItens('fromLocalStorage', +newCard.querySelector('.valor-produto').innerText.replace(',', '.'),item.iditens,'',+newCard.querySelector('.label-quantidade-produto').innerText);
-      } else { 
+      } else {
       //Tratando o valor do produto do card
       let valorOriginal = item.valorOriginal;
       const valorTarifarioAtual = item.tarifarios[0].valor;
@@ -335,7 +371,7 @@ function createCard(containersCard){
         classActivValueOriginal = 'valor-original-card';
         valorOriginal = (item.valorOriginal/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
       }
-      
+
       let valorFinal = (valorTarifarioAtual/100).toLocaleString("pt-BR", { minimumFractionDigits: 2, currency: 'BRL' });;
 
 
@@ -388,12 +424,12 @@ function createCard(containersCard){
         <div class="container-regras-card">
           <div class="regra-card-${classeContemFaixaEtaria}">
             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            <span class="regra-idade">${condicaoIdade}</span> 
+            <span class="regra-idade">${condicaoIdade}</span>
           </div>
-          <div class="regra-card-ativo"> 
+          <div class="regra-card-ativo">
             <svg class="regra-condicao" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             <span class="regra-condicao">Regras e condições</span>
-          </div> 
+          </div>
         </div>
         <div class="container-btn-card isComprar">
           <div class="btn-comprar-card isComprar" idItem="${item.iditens}">
@@ -417,22 +453,23 @@ function addEventsInCard(btnsComprar){
       //Verifica se clicou na label "Comprar"
       if (event.target.classList.contains('label-quantidade-produto') &&  event.target.innerText === 'Comprar'){
         transformButtonBuy(event.target.getAttribute('idItem'), 'twoButtons');
-      }  
+      }
       //Verifica se clicou no botão com a plavra "Comprar"
       if(event.target.classList.contains('btn-comprar-card') && event.target.classList.contains('isComprar')){
         transformButtonBuy(event.target.getAttribute('idItem'), 'twoButtons');
       }
-      //Subtrai a quantidade de itens do card, se for zerá-lo volta ele a forma original
+//refatorar os if's acima
+      //Subtrai a quantidade de itens do card, se for zerá-lo o volta para a forma original
       if (event.target.classList.contains('btn-subtrair')){
         subtrairQtdeItensCard(event.target.getAttribute('idItem'));
-      }  
+      }
       //Soma +1 na quantidade de itens do card
       if (event.target.classList.contains('btn-adicionar')){
         addQtdeItensCard(event.target.getAttribute('idItem'));
       }
     })
   })
-  hiddenLoandigWindow();
+  showLoandigWindow(false);
 }
 
 function transformButtonBuy(idItem, versao){
@@ -441,23 +478,27 @@ function transformButtonBuy(idItem, versao){
   const btnAddCart = returnCurrentElementCard('btn-adicionar', idItem);
   const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
   const valorItem = returnCurrentElementCard('valor-produto', idItem);
-if (versao === 'twoButtons'){
-  contadorItens('+', valorItem.innerText, idItem);
-  labelQtdeProdutos.innerText = '1';
-  btnClicado.classList.remove('isComprar');
-  btnAddCart.classList.remove('isComprarBtn');
-  btnSubCart.classList.remove('isComprarBtn');
-  addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
-} else if (versao === 'original'){
-  labelQtdeProdutos.innerText = 'Comprar';
-  localStorage.removeItem(idItem);
-  btnClicado.classList.add('isComprar');
-  btnAddCart.classList.add('isComprarBtn');
-  btnSubCart.classList.add('isComprarBtn');
-} else {
-  console.error('Erro: segundo parametro "versao" inválido');
-}
-}
+
+  if (versao === 'twoButtons'){
+    contadorItens('+', valorItem.innerText, idItem);
+    labelQtdeProdutos.innerText = '1';
+    btnClicado.classList.remove('isComprar');
+    btnAddCart.classList.remove('isComprarBtn');
+    btnSubCart.classList.remove('isComprarBtn');
+    addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
+
+  } else if (versao === 'original'){
+
+    labelQtdeProdutos.innerText = 'Comprar';
+    localStorage.removeItem(idItem);
+    btnClicado.classList.add('isComprar');
+    btnAddCart.classList.add('isComprarBtn');
+    btnSubCart.classList.add('isComprarBtn');
+    
+  } else {
+    console.error('Erro: segundo parametro "versao" inválido');
+  }
+}//faltando identação
 
 function subtrairQtdeItensCard(idItem){
 const valorItem = returnCurrentElementCard('valor-produto', idItem);
@@ -469,7 +510,7 @@ if(+labelQtdeProdutos.innerText === 1){
   +labelQtdeProdutos.innerText--
   localStorage.setItem(idItem, returnCurrentElementCard('card', idItem).innerHTML);
 }
-}
+}//faltando identação
 
 function addQtdeItensCard(idItem){
 const valorItem = returnCurrentElementCard('valor-produto', idItem);
@@ -477,13 +518,14 @@ contadorItens('+', valorItem.innerText, idItem);
 const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
 +labelQtdeProdutos.innerText++;
 addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
-}
+}//faltando identação
 
 function returnCurrentElementCard(classe, idItem){
 return document.querySelector(`.${classe}[idItem="${idItem}"]`);
-}
+}//faltando identação
 
 function createTabsAndContainerCards(arrayGroups){
+  //refatorar codigo
   //Criando e adicionando os botões de navegação por tabs e setando o primeiro como o botão "ativo".
   arrayGroups.forEach((grupo, index) =>{
     let newButton = document.createElement('button');
@@ -495,7 +537,6 @@ function createTabsAndContainerCards(arrayGroups){
     newButton.innerText = `${grupo.nome}`;
     containerTabs.appendChild(newButton);
   })
-
   // Criando e adicionando os containers de cards de navegação por tabs e colocando o primeiro container como "Ativo";
   arrayGroups.forEach((grupo, index) => {
     const newContainer = document.createElement('div');
@@ -510,6 +551,7 @@ function createTabsAndContainerCards(arrayGroups){
   const btnsNav = document.querySelectorAll('.btn-tab');
   const containersCard = document.querySelectorAll('.container-cards');
 
+  //daria para adionar o evento no for acima
   //Evento para navegação de tabs.
   btnsNav.forEach((btn) =>{
     btn.addEventListener('click', () =>{
@@ -527,9 +569,12 @@ function createTabsAndContainerCards(arrayGroups){
       } else if (idGroupBtn === idGroupContainer){
         container.classList.add('container-cards-ativo');
       }
-      })   
+      })
     })
   })
+
+//Não poderia ter usado o mesmo ForEach para as situações acima?
+
   createCard(containersCard);
 }
 
