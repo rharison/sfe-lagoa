@@ -89,8 +89,8 @@ function returnStateDetailsCartIsOpen(){
 }
 
 function openOrClosedDetailsCart(openOrClosed){
+  setasCarrinho.forEach(seta => seta.classList.toggle('para-cima'));
   if (openOrClosed === 'open'){
-    setasCarrinho.forEach(seta => seta.style.animation = '0.4s 0s infinite alternate animacao-seta-carrinho-cima');
     divContainerCarrinho.classList.remove('fechado');
     divContainerCarrinho.classList.add('aberto');
     divListaProdutosCarrinho.classList.add('aberto')
@@ -103,7 +103,7 @@ function openOrClosedDetailsCart(openOrClosed){
     }
 
   } else if (openOrClosed === 'close'){
-    setasCarrinho.forEach(seta => seta.style.animation = '0.4s 0s infinite alternate animacao-seta-carrinho-baixo');
+    //setasCarrinho.forEach(seta => seta.style.animation = '0.4s 0s infinite alternate animacao-seta-carrinho-baixo');
     divContainerCarrinho.classList.remove('aberto');
     divListaProdutosCarrinho.classList.remove('aberto')
     divContainerBtnCarrinho.classList.remove('aberto-sem-produtos');
@@ -112,8 +112,6 @@ function openOrClosedDetailsCart(openOrClosed){
     divListaProdutosCarrinho.classList.add('fechado')
     divContainerBtnCarrinho.classList.add('fechado');
     divContainerBtnCarrinho.classList.add('fechado');
-  } else{
-    console.error('O argumento openOrClosed é inválido');
   }
 }
 
