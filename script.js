@@ -30,8 +30,6 @@ async function newFetch(){
    
     objReturnFetch = await response.json();
     createTabsAndContainerCards(objReturnFetch.grupos);
-    tratarObjeto(objReturnFetch);
-    
   }
   catch(erro){
     console.error('Erro : ' + erro);
