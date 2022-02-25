@@ -19,7 +19,7 @@ newFetch();
 
 async function newFetch(){
   try {
-    const url = `https://sofalta.eu/api/v4/empreendimentos/lagoa/produtos/ingressos/ingressos?data=2022-02-25`;
+    const url = `https://sofalta.eu/api/v4/empreendimentos/lagoa/produtos/ingressos/ingressos?data=2022-03-30`;
     let response = await fetch(url);
     if (!response.ok) {
       console.error('HTTP error! status: ' + response.status)
@@ -103,7 +103,6 @@ function openOrClosedDetailsCart(openOrClosed){
     }
 
   } else if (openOrClosed === 'close'){
-    //setasCarrinho.forEach(seta => seta.style.animation = '0.4s 0s infinite alternate animacao-seta-carrinho-baixo');
     divContainerCarrinho.classList.remove('aberto');
     divListaProdutosCarrinho.classList.remove('aberto')
     divContainerBtnCarrinho.classList.remove('aberto-sem-produtos');
@@ -116,40 +115,28 @@ function openOrClosedDetailsCart(openOrClosed){
 }
 
 function contadorItens(operacao, valorItem, idItem, qtdeItemRemover, qtdeItemAdiconar){
-  if (operacao === '+'){
-    btnCarrinhoNext.removeAttribute('disabled');
-    calcValueCart('+', valorItem, idItem);
-    contadorItensCarrinho.forEach(contador =>{
-      +contador.innerText ++;
-    })
-  } else if (operacao === '-') {
-    calcValueCart('-', valorItem, idItem);
-    contadorItensCarrinho.forEach(contador =>{
-      +contador.innerText --;
-    })
-    if (+contadorItensCarrinho[0].innerText === 0){
-      btnCarrinhoNext.setAttribute('disabled','');
-    }
-  } else if (operacao === '-all'){
-    calcValueCart('-all', '', idItem, valorItem);
-    contadorItensCarrinho.forEach(contador =>{
-      contador.innerText = +contador.innerText - qtdeItemRemover;
-    });
-    if (+contadorItensCarrinho[0].innerText === 0){
-      btnCarrinhoNext.setAttribute('disabled','');
-    }
-  } else if (operacao === 'fromLocalStorage'){
-    contadorItensCarrinho.forEach(contador =>{
-      contador.innerText = +contador.innerText + qtdeItemAdiconar;
-    });
-    calcValueCart('fromLocalStorage', valorItem*qtdeItemAdiconar, idItem);
+  let qtdeContador = Number(contadorItensCarrinho[0].innerText);
+  switch (operacao) {
+    case '+':
+      btnCarrinhoNext.removeAttribute('disabled');
+      qtdeContador++
+    break;
+    case '-':
+      qtdeContador--
+    break;
+    case '-all':
+      qtdeContador = qtdeContador - qtdeItemRemover;
+    break;
+    case 'fromLocalStorage':
+      qtdeContador = qtdeContador + qtdeItemAdiconar;
+    break;
   }
-  else{
-    console.error('Valor passado como operacao Inválida')
-  }
+  contadorItensCarrinho.forEach(contador => contador.innerText = qtdeContador);
+  calcValueCart(operacao, valorItem, idItem);
+  if (!Number(contadorItensCarrinho[0].innerText)) btnCarrinhoNext.setAttribute('disabled','');
 }   
 
-function calcValueCart(operacao, valor, idItem, valorTotal){
+function calcValueCart(operacao, valor, idItem){
   let addOrRemoveParametro;
   let valorUnitario;
   valorCarrinhos.forEach(valorCarrinho =>{
@@ -166,7 +153,7 @@ function calcValueCart(operacao, valor, idItem, valorTotal){
       valorFinal = valorAtual - valorUnitario;
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
     } else if (operacao === '-all'){
-      valorFinal = valorAtual - +valorTotal.toFixed(2);
+      valorFinal = valorAtual - +valor.toFixed(2);
       valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
     } else if (operacao === 'fromLocalStorage') {
       valorFinal = valorAtual + valor;
@@ -293,7 +280,9 @@ function createCard(containersCard){
         Array.from(divListaProdutosCarrinho.childNodes).some(child => child.classList.contains('nenhum-produto')) ? divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho) : false;
         newCard.innerHTML = localStorage.getItem(item.iditens);
         createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
-        contadorItens('fromLocalStorage', +newCard.querySelector('.valor-produto').innerText.replace(',', '.'),item.iditens,'',+newCard.querySelector('.label-quantidade-produto').innerText);
+        const valorUnitarioItem = Number(newCard.querySelector('.valor-produto').innerText.replace(',', '.'));
+        const qtdeItem = Number(newCard.querySelector('.label-quantidade-produto').innerText);
+        contadorItens('fromLocalStorage', valorUnitarioItem * qtdeItem,item.iditens, '', qtdeItem);
       } else { 
       //Tratando o valor do produto do card
       let valorOriginal = item.valorOriginal;

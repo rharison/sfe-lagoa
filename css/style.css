@@ -407,11 +407,15 @@ button {
   flex-wrap: nowrap;
 }
 
-.container-detail-botton-carrinho > svg {
+.seta-carrinho {
   display: flex;
   position: absolute;
   align-self: center;
   animation: 0.4s 0s infinite alternate animacao-seta-carrinho-baixo;
+}
+
+.seta-carrinho.para-cima {
+  animation: 0.4s 0s infinite alternate animacao-seta-carrinho-cima;
 }
 
 .detail-botton-carrinho {
