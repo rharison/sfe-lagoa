@@ -77,14 +77,13 @@ body.addEventListener('click',(event)=> {
   }
 })
 
-divDetailsCarrinho.addEventListener('click', (event) =>{
+divDetailsCarrinho.addEventListener('click', () =>{
   const openOrClosed = returnStateDetailsCartIsOpen() ? 'close' : 'open';
   openOrClosedDetailsCart(openOrClosed);
 })
 
-divListaProdutosCarrinho.addEventListener('click', (event) =>{
-  openOrClosedDetailsCart('close');
-})
+//divListaProdutosCarrinho.addEventListener('click', () => openOrClosedDetailsCart('close'));
+
 
 
 divContainerBtnCarrinho.addEventListener('click', (event) =>{
