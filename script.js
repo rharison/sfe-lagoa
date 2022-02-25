@@ -71,7 +71,8 @@ window.addEventListener('scroll', function(){
 body.addEventListener('click',(event)=> {
   if(event.target.classList.contains('details-carrinho') || event.target.classList.contains('details-carrinho-full')){
     return;
-  } else if (returnStateDetailsCartIsOpen()){
+  } 
+  if (returnStateDetailsCartIsOpen()){
     openOrClosedDetailsCart('close');
   }
 })
