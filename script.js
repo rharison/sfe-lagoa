@@ -69,12 +69,9 @@ window.addEventListener('scroll', function(){
 });
 
 body.addEventListener('click',(event)=> {
-   if(event.target.classList.contains('details-carrinho') || event.target.classList.contains('details-carrinho-full') || event.target.classList.contains('btn-carrinho')) {
-    return;
-  } 
-  if (returnStateDetailsCartIsOpen()){
-    openOrClosedDetailsCart('close');
-  }
+  const classesCondicao = ['details-carrinho', 'details-carrinho-full', 'btn-carrinho'];
+  if(classesCondicao.some(classe => event.target.classList.contains(classe))) return;
+  if(returnStateDetailsCartIsOpen()) openOrClosedDetailsCart('close');
 })
 
 divDetailsCarrinho.addEventListener('click', () =>{
@@ -82,11 +79,9 @@ divDetailsCarrinho.addEventListener('click', () =>{
   openOrClosedDetailsCart(openOrClosed);
 })
 
-divCarrinhoFull.addEventListener('click', (event) =>{
+divCarrinhoFull.addEventListener('click', () =>{
   window.scrollTo(0, 345);
-  if (!returnStateDetailsCartIsOpen()){
-    openOrClosedDetailsCart('open');
-  }
+  if (!returnStateDetailsCartIsOpen()) openOrClosedDetailsCart('open');
 })
 
 function returnStateDetailsCartIsOpen(){
