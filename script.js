@@ -65,7 +65,8 @@ window.addEventListener('resize',(event) => {
 });
 
 window.addEventListener('scroll', function(){
-  divCarrinhoFull.style.top = divDetailsCarrinho.getBoundingClientRect().top <= -2 ? 0 : '-90px'
+  const distanciaDoElementoAoTop = -2;
+  divCarrinhoFull.style.top = divDetailsCarrinho.getBoundingClientRect().top <= distanciaDoElementoAoTop ? 0 : '-90px'
 });
 
 body.addEventListener('click',(event)=> {
@@ -162,32 +163,41 @@ function createAndInsertItemDetailsCart(idItem, type){
   const newProdutosListaCarrinho = document.createElement('div');
   newProdutosListaCarrinho.classList.add('produto-lista-carrinho')
   newProdutosListaCarrinho.setAttribute('iditem', idItem);
+
   if (type === 'fromLocalStorage'){
-    newProdutosListaCarrinho.innerHTML = localStorage.getItem(`itemLista[${idItem}]`);
+    const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
+    newProdutosListaCarrinho.innerHTML = htmlInNewDivProdutoListaCarrinho(idItem, objItensListaLocalStorage[idItem].nomeProduto, objItensListaLocalStorage[idItem].qtdeProduto, objItensListaLocalStorage[idItem].valorProduto);
     divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
-    const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
-    iconRemoveItemListCart.addEventListener('click', (event) =>{
-      removeItemListCart(idItem);
-    });
   }
+  
   if (type === 'new'){
     const nomeProduto = returnCurrentElementCard('nome-produto', idItem).innerText;
     let valorProduto = returnCurrentElementCard('valor-produto', idItem).innerText;
-    valorProduto = (+valorProduto.replace(',','')/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
-    newProdutosListaCarrinho.innerHTML = 
-    `<div class="nome-produto-lista-produtos-carrinho" iditem="${idItem}">${nomeProduto}</div>
-    <div class="container-qtde-e-valor-produto">
-    <div class="qtde-produto-lista-produtos-carrinho" iditem="${idItem}">1x</div>
-    <div class="valor-produto-lista-produtos-carrinho" iditem="${idItem}">${valorProduto}</div>
-    <svg class ="icon-excluir-item-lista-produtos-carrinho" iditem="${idItem}" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-    </div>`
+    valorProduto = Number(valorProduto.replace(',','')/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
+    newProdutosListaCarrinho.innerHTML = htmlInNewDivProdutoListaCarrinho(idItem, nomeProduto, 1, valorProduto);
     divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
-    const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
-    iconRemoveItemListCart.addEventListener('click', function(event){
-      removeItemListCart(idItem, event);
-    });
-    localStorage.setItem(`itemLista[${idItem}]`, newProdutosListaCarrinho.innerHTML);
+    const newObjItensLista = {[idItem]:{nomeProduto: nomeProduto, qtdeProduto: 1, valorProduto: valorProduto}};
+    saveItensListaInLocalStorare(newObjItensLista);
   } 
+  const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
+  iconRemoveItemListCart.addEventListener('click', function(event){
+    removeItemListCart(idItem, event);
+  });
+}
+
+function saveItensListaInLocalStorare(newObjItensLista) {
+  const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
+  const objDadosSalvarLocalStorage = objItensListaLocalStorage ? {...objItensListaLocalStorage, ...newObjItensLista} : newObjItensLista;
+  localStorage.setItem(`itensLista`, JSON.stringify(objDadosSalvarLocalStorage));
+}
+
+function htmlInNewDivProdutoListaCarrinho(idItem, nomeProduto, qtdeProduto, valorProduto){
+  return `<div class="nome-produto-lista-produtos-carrinho" iditem="${idItem}">${nomeProduto}</div>
+  <div class="container-qtde-e-valor-produto">
+  <div class="qtde-produto-lista-produtos-carrinho" iditem="${idItem}">${qtdeProduto}x</div>
+  <div class="valor-produto-lista-produtos-carrinho" iditem="${idItem}">${valorProduto}</div>
+  <svg class ="icon-excluir-item-lista-produtos-carrinho" iditem="${idItem}" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+  </div>`
 }
 
 function removeItemListCart(idItem, event){
@@ -215,7 +225,10 @@ function updateItemDetailsCart(idItem, operacao){
   if (operacao === '+'){
     qtdeFinalItem = qtdeAtualItem + 1;
     elementoQtdeAtualItem.innerText = `${qtdeFinalItem}x`;
-    localStorage.setItem(`itemLista[${idItem}]`, atualProdutoListaCarrinho.innerHTML);
+    const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
+    objItensListaLocalStorage[idItem].qtdeProduto = qtdeFinalItem;
+    localStorage.setItem(`itensLista`, JSON.stringify(objItensListaLocalStorage));
+
   } else if (operacao === '-'){
     if (qtdeAtualItem === 1){
       divListaProdutosCarrinho.removeChild(elementoProdutoLista);
@@ -229,9 +242,7 @@ function updateItemDetailsCart(idItem, operacao){
       elementoQtdeAtualItem.innerText = `${qtdeFinalItem}x`;
       localStorage.setItem(`itemLista[${idItem}]`, atualProdutoListaCarrinho.innerHTML);
     }
-  } else {
-    console.error(`O parâmetro "operacao" informado é inválido | Parâmetro: ${opecarao}`)
-  }
+  } 
 }
 
 function addOrRemoveItemDetailsCart(addOrRemove, idItem){
