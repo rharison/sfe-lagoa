@@ -59,9 +59,9 @@ function tratarObjeto(objDados){
   return finalObject;
 }
 
-window.addEventListener('resize', function() {
-  const btnCarrinhoOtherDay = document.querySelector ('.btn-carrinho-buy-other-day');
-  btnCarrinhoOtherDay.getBoundingClientRect().width <= 223 ? btnCarrinhoOtherDay.innerText = 'Outro dia' : btnCarrinhoOtherDay.innerText = 'Comprar para outro dia';
+window.addEventListener('resize',(event) => {
+  const btnCarrinhoOtherDay = document.querySelector('.btn-carrinho-buy-other-day');
+  btnCarrinhoOtherDay.innerText = btnCarrinhoOtherDay.offsetWidth <= 223 ?  'Outro dia' : 'Comprar para outro dia';
 });
 
 window.addEventListener('scroll', function(){
