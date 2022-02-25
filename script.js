@@ -65,15 +65,7 @@ window.addEventListener('resize',(event) => {
 });
 
 window.addEventListener('scroll', function(){
-  let distanciaDivCarrinhoTop = divDetailsCarrinho.getBoundingClientRect().top;
-  let distanciaDivContainerBtnCarrinhoTop = divContainerBtnCarrinho.getBoundingClientRect().top;
-  let distanciaDivCarrinhoBotton = divDetailsCarrinho.getBoundingClientRect().bottom;
-  if (distanciaDivCarrinhoTop <= -2){
-    divCarrinhoFull.style.top = 0;
-  }    
-  else if (distanciaDivCarrinhoBotton >= 85){
-    divCarrinhoFull.style.top = '-90px';
-  }
+  divCarrinhoFull.style.top = divDetailsCarrinho.getBoundingClientRect().top <= -2 ? 0 : '-90px'
 });
 
 body.addEventListener('click',(event)=> {
