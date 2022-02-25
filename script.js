@@ -421,14 +421,14 @@ function subtrairQtdeItensCard(idItem){
 }
 
 function addQtdeItensCard(idItem){
-const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
-contadorItens('+', Number(valorItem), idItem);
-const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
-+labelQtdeProdutos.innerText++;
+  const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
+  contadorItens('+', Number(valorItem), idItem);
+  const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
+  +labelQtdeProdutos.innerText++;
 }
 
 function returnCurrentElementCard(classe, idItem){
-return document.querySelector(`.${classe}[idItem="${idItem}"]`);
+  return document.querySelector(`.${classe}[idItem="${idItem}"]`);
 }
 
 function createTabsAndContainerCards(arrayGroups){
