@@ -432,26 +432,19 @@ function returnCurrentElementCard(classe, idItem){
 }
 
 function createTabsAndContainerCards(arrayGroups){
-  //Criando e adicionando os botões de navegação por tabs e setando o primeiro como o botão "ativo".
-  arrayGroups.forEach((grupo, index) =>{
-    let newButton = document.createElement('button');
-    newButton.classList.add('btn-tab');
-    if (index === 0){
-      newButton.classList.add('btn-ativo');
-    }
-    newButton.setAttribute('idgroup',`${grupo.id}`);
-    newButton.innerText = `${grupo.nome}`;
-    containerTabs.appendChild(newButton);
-  })
-
-  // Criando e adicionando os containers de cards de navegação por tabs e colocando o primeiro container como "Ativo";
   arrayGroups.forEach((grupo, index) => {
+    const newButton = document.createElement('button');
     const newContainer = document.createElement('div');
+    newButton.classList.add('btn-tab');
     newContainer.classList.add('container-cards');
-    if (index === 0){
+    if (index === 0) {
+      newButton.classList.add('btn-ativo');
       newContainer.classList.add('container-cards-ativo');
     }
+    newButton.setAttribute('idgroup',`${grupo.id}`);
     newContainer.setAttribute('idgroup', grupo.id);
+    newButton.innerText = `${grupo.nome}`;
+    containerTabs.appendChild(newButton);
     containerAllCards.appendChild(newContainer);
   })
 
