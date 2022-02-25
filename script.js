@@ -169,7 +169,7 @@ function createAndInsertItemDetailsCart(idItem, type){
     newProdutosListaCarrinho.innerHTML = htmlInNewDivProdutoListaCarrinho(idItem, objItensListaLocalStorage[idItem].nomeProduto, objItensListaLocalStorage[idItem].qtdeProduto, objItensListaLocalStorage[idItem].valorProduto);
     divListaProdutosCarrinho.appendChild(newProdutosListaCarrinho);
   }
-  
+
   if (type === 'new'){
     const nomeProduto = returnCurrentElementCard('nome-produto', idItem).innerText;
     let valorProduto = returnCurrentElementCard('valor-produto', idItem).innerText;
@@ -179,6 +179,7 @@ function createAndInsertItemDetailsCart(idItem, type){
     const newObjItensLista = {[idItem]:{nomeProduto: nomeProduto, qtdeProduto: 1, valorProduto: valorProduto}};
     saveItensListaInLocalStorare(newObjItensLista);
   } 
+  
   const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
   iconRemoveItemListCart.addEventListener('click', function(event){
     removeItemListCart(idItem, event);
@@ -217,6 +218,7 @@ function removeItemListCart(idItem, event){
 }
 
 function updateItemDetailsCart(idItem, operacao){
+  const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
   const elementoProdutoLista = document.querySelector(`.produto-lista-carrinho[idItem="${idItem}"]`);
   const elementoQtdeAtualItem = document.querySelector(`.qtde-produto-lista-produtos-carrinho[idItem="${idItem}"]`);
   const atualProdutoListaCarrinho = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
@@ -228,19 +230,19 @@ function updateItemDetailsCart(idItem, operacao){
     const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
     objItensListaLocalStorage[idItem].qtdeProduto = qtdeFinalItem;
     localStorage.setItem(`itensLista`, JSON.stringify(objItensListaLocalStorage));
-
-  } else if (operacao === '-'){
+  } 
+  if (operacao === '-'){
     if (qtdeAtualItem === 1){
       divListaProdutosCarrinho.removeChild(elementoProdutoLista);
-      localStorage.removeItem(`itemLista[${idItem}]`);
+      delete objItensListaLocalStorage[idItem];
+      localStorage.setItem(`itensLista`, JSON.stringify(objItensListaLocalStorage));
       const produtosListaCarrinho = document.querySelectorAll('.produto-lista-carrinho');
-      if (produtosListaCarrinho.length === 0){
-        divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
-      }
+      if (produtosListaCarrinho.length === 0) divListaProdutosCarrinho.appendChild(spanNenhumProdutoListaCarrinho);
     } else {
       qtdeFinalItem = qtdeAtualItem - 1;
       elementoQtdeAtualItem.innerText = `${qtdeFinalItem}x`;
-      localStorage.setItem(`itemLista[${idItem}]`, atualProdutoListaCarrinho.innerHTML);
+      objItensListaLocalStorage[idItem].qtdeProduto = qtdeFinalItem;
+      localStorage.setItem(`itensLista`, JSON.stringify(objItensListaLocalStorage));
     }
   } 
 }
