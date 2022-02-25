@@ -136,37 +136,26 @@ function contadorItens(operacao, valorItem, idItem, qtdeItemRemover, qtdeItemAdi
   if (!Number(contadorItensCarrinho[0].innerText)) btnCarrinhoNext.setAttribute('disabled','');
 }   
 
-function calcValueCart(operacao, valor, idItem){
-  let addOrRemoveParametro;
-  let valorUnitario;
-  valorCarrinhos.forEach(valorCarrinho =>{
-    const valorAtual = +valorCarrinho.innerText.replace(',','').replace('.','')/100;
-    let valorFinal;
-    if (operacao === '+') {
-      valorUnitario = +valor.replace(',','')/100;
-      addOrRemoveParametro = 'add';
-      valorFinal = valorAtual + valorUnitario;
-      valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    } else if (operacao === '-') {
-      valorUnitario = +valor.replace(',','')/100;
-      addOrRemoveParametro = 'remove';
-      valorFinal = valorAtual - valorUnitario;
-      valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    } else if (operacao === '-all'){
-      valorFinal = valorAtual - +valor.toFixed(2);
-      valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    } else if (operacao === 'fromLocalStorage') {
+function calcValueCart(operacao, valor, idItem) {
+  const valorAtual = Number(valorCarrinhos[0].innerText.replace(',','').replace('.','')/100);
+  let valorFinal;
+  switch (operacao) {
+     case '+':
       valorFinal = valorAtual + valor;
-      valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' });
-    } else{
-      console.error('Valor passado como operacao Inválida')
-    }
-  })
-  if (addOrRemoveParametro === 'add'){
-    addOrRemoveItemDetailsCart(addOrRemoveParametro, idItem);
-  } else if (addOrRemoveParametro === 'remove'){
-    addOrRemoveItemDetailsCart(addOrRemoveParametro, idItem);
+      addOrRemoveItemDetailsCart('add', idItem);
+    break;
+    case '-':
+      valorFinal = valorAtual - valor;
+      addOrRemoveItemDetailsCart('remove', idItem);
+    break;
+    case '-all':
+      valorFinal = valorAtual - Number(valor.toFixed(2));
+    break;
+    case 'fromLocalStorage':
+      valorFinal = valorAtual + valor;
+    break;
   }
+  valorCarrinhos.forEach(valorCarrinho => valorCarrinho.innerText = valorFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2 , currency: 'BRL' }));
 } 
 
 function createAndInsertItemDetailsCart(idItem, type){ 
@@ -400,9 +389,9 @@ function transformButtonBuy(idItem, versao){
   const btnSubCart = returnCurrentElementCard('btn-subtrair', idItem);
   const btnAddCart = returnCurrentElementCard('btn-adicionar', idItem);
   const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
-  const valorItem = returnCurrentElementCard('valor-produto', idItem);
+  const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
 if (versao === 'twoButtons'){
-  contadorItens('+', valorItem.innerText, idItem);
+  contadorItens('+', Number(valorItem), idItem);
   labelQtdeProdutos.innerText = '1';
   btnClicado.classList.remove('isComprar');
   btnAddCart.classList.remove('isComprarBtn');
@@ -420,8 +409,8 @@ if (versao === 'twoButtons'){
 }
 
 function subtrairQtdeItensCard(idItem){
-const valorItem = returnCurrentElementCard('valor-produto', idItem);
-contadorItens('-', valorItem.innerText, idItem);
+const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
+contadorItens('-', Number(valorItem), idItem);
 const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
 if(+labelQtdeProdutos.innerText === 1){
   transformButtonBuy(idItem, 'original')
@@ -432,8 +421,8 @@ if(+labelQtdeProdutos.innerText === 1){
 }
 
 function addQtdeItensCard(idItem){
-const valorItem = returnCurrentElementCard('valor-produto', idItem);
-contadorItens('+', valorItem.innerText, idItem);
+const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
+contadorItens('+', Number(valorItem), idItem);
 const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
 +labelQtdeProdutos.innerText++;
 addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
