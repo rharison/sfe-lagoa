@@ -8,7 +8,6 @@ const contadorItensCarrinho = document.querySelectorAll('.contador-carrinho');
 const containerCards = document.querySelector('.container-cards');
 const containerTabs = document.querySelector('.container-nav-tabs');
 const containerAllCards = document.querySelector('.cards');
-const url = `https://sofalta.eu/api/v4/empreendimentos/lagoa/produtos/ingressos/ingressos?data=2022-02-25`;
 const btnCarrinhoNext = document.querySelector('.btn-carrinho-next');
 const valorCarrinhos = document.querySelectorAll('.valor-carrinho');
 const spanNenhumProdutoListaCarrinho = document.querySelector('.nenhum-produto');
@@ -21,7 +20,7 @@ newFetch();
 
 async function newFetch(){
   try {
-    showLoandigWindow(true);
+    const url = `https://sofalta.eu/api/v4/empreendimentos/lagoa/produtos/ingressos/ingressos?data=2022-02-25`;
     let response = await fetch(url);
     if (!response.ok) {
       console.error('HTTP error! status: ' + response.status)
@@ -37,24 +36,16 @@ async function newFetch(){
   }
   catch(erro){
     console.error('Erro : ' + erro);
-    showLoandigWindow(false);
+    hiddenLoandigWindow()
     divContainerCorpoSite.innerText = 'Erro no servidor! Tente recarregar a página';
     divContainerCorpoSite.style.height = '190px';
   }
 }
 
-function showLoandigWindow(isShow){
-  const detailsCarrinhoFull = document.querySelector('.details-carrinho-full');
-  const containerBody = document.querySelector('.container-corpo-site');
-  const loader = document.querySelector('.loader');
-  if (isShow){
-    detailsCarrinhoFull.style.opacity = '0';
-    containerBody.style.opacity = "0";
-  } else{
-    detailsCarrinhoFull.style.opacity = '1';
-    containerBody.style.opacity = '1';
-    loader.style.display = "none";
-  }
+function hiddenLoandigWindow(){
+  document.querySelector('.details-carrinho-full').style.opacity = '1';
+  document.querySelector('.container-corpo-site').style.opacity = '1';
+  document.querySelector('.loader').style.display = "none";
 }
 
 function tratarObjeto(objDados){
@@ -446,7 +437,7 @@ function addEventsInCard(btnsComprar){
       }
     })
   })
-  showLoandigWindow(false);
+  hiddenLoandigWindow();
 }
 
 function transformButtonBuy(idItem, versao){

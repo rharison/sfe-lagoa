@@ -29,6 +29,7 @@ button {
   justify-content: center;
   transition: 0.5s;
   margin-bottom: 65px;
+  opacity: 1;
 }
 
 .container-header::after,
@@ -167,6 +168,7 @@ button {
   align-items: center;
   transition: 0.9s;
   transition-timing-function: linear;
+  opacity: 0;
 }
 
 .details-carrinho-full {
@@ -183,6 +185,7 @@ button {
   transition: all 0.4s ease-in-out 0s;
   box-shadow: rgb(211, 217, 223) 0px 0px 17px;
   overflow: hidden;
+  opacity: 0;
 }
 
 .container-carrinho.fechado {
