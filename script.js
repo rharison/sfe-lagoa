@@ -410,14 +410,14 @@ function transformButtonBuy(idItem, versao){
 }
 
 function subtrairQtdeItensCard(idItem){
-const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
-contadorItens('-', Number(valorItem), idItem);
-const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
-if(+labelQtdeProdutos.innerText === 1){
-  transformButtonBuy(idItem, 'original')
-} else{
-  +labelQtdeProdutos.innerText--
-}
+  const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
+  contadorItens('-', Number(valorItem), idItem);
+  const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
+  if(+labelQtdeProdutos.innerText === 1){
+    transformButtonBuy(idItem, 'original')
+  } else{
+   +labelQtdeProdutos.innerText--
+  }
 }
 
 function addQtdeItensCard(idItem){
