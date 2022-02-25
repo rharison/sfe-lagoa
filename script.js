@@ -179,7 +179,7 @@ function createAndInsertItemDetailsCart(idItem, type){
     const newObjItensLista = {[idItem]:{nomeProduto: nomeProduto, qtdeProduto: 1, valorProduto: valorProduto}};
     saveItensListaInLocalStorare(newObjItensLista);
   } 
-  
+
   const iconRemoveItemListCart = document.querySelector(`.icon-excluir-item-lista-produtos-carrinho[iditem="${idItem}"`);
   iconRemoveItemListCart.addEventListener('click', function(event){
     removeItemListCart(idItem, event);
@@ -202,6 +202,7 @@ function htmlInNewDivProdutoListaCarrinho(idItem, nomeProduto, qtdeProduto, valo
 }
 
 function removeItemListCart(idItem, event){
+  const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
   const itenListCart = document.querySelector(`.produto-lista-carrinho[iditem="${idItem}"]`);
   const qtdeItenListCart = +document.querySelector(`.qtde-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('x','');
   const valorTotalItenListCart = +(document.querySelector(`.valor-produto-lista-produtos-carrinho[iditem="${idItem}"]`).innerText.replace('R$', '').replace(',','').replace('.','')/100) * qtdeItenListCart;
@@ -213,7 +214,8 @@ function removeItemListCart(idItem, event){
     openOrClosedDetailsCart('open');
   }
   contadorItens('-all', valorTotalItenListCart, idItem, qtdeItenListCart);
-  localStorage.removeItem(`itemLista[${idItem}]`);
+  delete objItensListaLocalStorage[idItem];
+  localStorage.setItem(`itensLista`, JSON.stringify(objItensListaLocalStorage));
   transformButtonBuy(idItem, 'original');
 }
 
