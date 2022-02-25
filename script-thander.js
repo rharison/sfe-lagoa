@@ -116,11 +116,6 @@ divDetailsCarrinho.addEventListener('click', (event) =>{
   }
 })
 
-divListaProdutosCarrinho.addEventListener('click', (event) =>{
-  openOrClosedDetailsCart('close');
-})
-
-
 divContainerBtnCarrinho.addEventListener('click', (event) =>{
   if (returnStateDetailsCartIsOpen() && event.target.classList.contains('container-btn-carrinho')){
     openOrClosedDetailsCart('close');

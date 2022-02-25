@@ -78,12 +78,8 @@ body.addEventListener('click',(event)=> {
 })
 
 divDetailsCarrinho.addEventListener('click', (event) =>{
-  
-  if (returnStateDetailsCartIsOpen()){
-    openOrClosedDetailsCart('close');
-  } else {
-    openOrClosedDetailsCart('open');
-  }
+  const openOrClosed = returnStateDetailsCartIsOpen() ? 'close' : 'open';
+  openOrClosedDetailsCart(openOrClosed);
 })
 
 divListaProdutosCarrinho.addEventListener('click', (event) =>{
