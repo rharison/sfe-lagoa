@@ -395,20 +395,18 @@ function transformButtonBuy(idItem, versao){
   const btnAddCart = returnCurrentElementCard('btn-adicionar', idItem);
   const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
   const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.replace(',','')/100;
-if (versao === 'twoButtons'){
-  contadorItens('+', Number(valorItem), idItem);
-  labelQtdeProdutos.innerText = '1';
-  btnClicado.classList.remove('isComprar');
-  btnAddCart.classList.remove('isComprarBtn');
-  btnSubCart.classList.remove('isComprarBtn');
-} else if (versao === 'original'){
-  labelQtdeProdutos.innerText = 'Comprar';
-  btnClicado.classList.add('isComprar');
-  btnAddCart.classList.add('isComprarBtn');
-  btnSubCart.classList.add('isComprarBtn');
-} else {
-  console.error('Erro: segundo parametro "versao" inválido');
-}
+  if (versao === 'twoButtons'){
+    contadorItens('+', Number(valorItem), idItem);
+    labelQtdeProdutos.innerText = '1';
+    btnClicado.classList.remove('isComprar');
+    btnAddCart.classList.remove('isComprarBtn');
+    btnSubCart.classList.remove('isComprarBtn');
+  } else if (versao === 'original'){
+    labelQtdeProdutos.innerText = 'Comprar';
+    btnClicado.classList.add('isComprar');
+    btnAddCart.classList.add('isComprarBtn');
+    btnSubCart.classList.add('isComprarBtn');
+  } 
 }
 
 function subtrairQtdeItensCard(idItem){
