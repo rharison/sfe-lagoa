@@ -258,9 +258,10 @@ function addOrRemoveItemDetailsCart(addOrRemove, idItem){
   if (addOrRemove === 'remove') updateItemDetailsCart(idItem, '-');
 }
 
-
 function createCard(containersCard){
   const objTratatdo = tratarObjeto(objReturnFetch);
+  const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
+  
   containersCard.forEach(container => {
     objTratatdo[container.getAttribute('idgroup')].forEach((item) =>{
       let newCard = document.createElement('div');
@@ -269,15 +270,6 @@ function createCard(containersCard){
       newCard.setAttribute('idItem', item.iditens)
       newCard.setAttribute('style', `order: ${item[item.grupos[0]]}`);
 
-      if (localStorage.getItem(item.iditens) && !(localStorage.getItem(item.iditens) === "") && !(localStorage.getItem(`itemLista[${item.iditens}]`) === "")){
-        Array.from(divListaProdutosCarrinho.childNodes).some(child => child.classList.contains('nenhum-produto')) ? divListaProdutosCarrinho.removeChild(spanNenhumProdutoListaCarrinho) : false;
-        newCard.innerHTML = localStorage.getItem(item.iditens);
-        createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
-        const valorUnitarioItem = Number(newCard.querySelector('.valor-produto').innerText.replace(',', '.'));
-        const qtdeItem = Number(newCard.querySelector('.label-quantidade-produto').innerText);
-        contadorItens('fromLocalStorage', valorUnitarioItem * qtdeItem,item.iditens, '', qtdeItem);
-      } else { 
-      //Tratando o valor do produto do card
       let valorOriginal = item.valorOriginal;
       const valorTarifarioAtual = item.tarifarios[0].valor;
       let classActivValueOriginal = '';
@@ -288,11 +280,8 @@ function createCard(containersCard){
         classActivValueOriginal = 'valor-original-card';
         valorOriginal = (item.valorOriginal/100).toLocaleString("pt-BR", { minimumFractionDigits: 2 , style: 'currency', currency: 'BRL' });
       }
-      
+
       let valorFinal = (valorTarifarioAtual/100).toLocaleString("pt-BR", { minimumFractionDigits: 2, currency: 'BRL' });;
-
-
-      //Tratando o campo de regras de idade do card
       let condicaoIdade;
       let classeContemFaixaEtaria = "ativo";
       if (item.itens.ingressos.length){
@@ -308,59 +297,71 @@ function createCard(containersCard){
       } else{
         classeContemFaixaEtaria = 'inativo';
       }
-      let urlImgMaisVendido;
-      let classeMaisVendido;
+      let urlImgMaisVendido = '';
+      let classeMaisVendido = '';
       if (item.idGroupMaisVendidos.length > 0){
         urlImgMaisVendido = '/img/mais-vendido.png';
         classeMaisVendido = 'img-imagem-mais-vendido'
-      } else{
-        urlImgMaisVendido = '';
-        classeMaisVendido = '';
-      }
+      } 
+      let classeIsComprar = 'isComprar';
+      let classeIsComprarBtn = 'isComprarBtn';
+      let palavraComprarOuQtde = 'Comprar'
 
-      newCard.innerHTML =
-      `<img src="${item.imagem}" alt="" class="img-card">
-      <img class="${classeMaisVendido}" src="${urlImgMaisVendido}">
-        <div class="infos-card">
-          <div class="container-descricao-card">
-            <div class="container-nome-valor-produto-card">
-              <div class="nome-produto" idItem="${item.iditens}">${item.nome}</div>
-              <div class="container-valor-produto">
-                <span class="${classActivValueOriginal}">${valorOriginal}</span>
-                <div class="container-display-valor">
-                  <span>R$</span>
-                  <div class="valor-produto" idItem="${item.iditens}">${valorFinal}</div>
-                </div>
-              <div class="max-parcelamento">${`em até ${objReturnFetch.maximoQtdParcelamento}x`}</div>
-            </div>
-          </div>
-          <div class="descricao-card">
-            <p>${item.descricao}</p>
-          </div>
-        </div>
-        <div class="container-regras-card">
-          <div class="regra-card-${classeContemFaixaEtaria}">
-            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            <span class="regra-idade">${condicaoIdade}</span> 
-          </div>
-          <div class="regra-card-ativo"> 
-            <svg class="regra-condicao" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            <span class="regra-condicao">Regras e condições</span>
-          </div> 
-        </div>
-        <div class="container-btn-card isComprar">
-          <div class="btn-comprar-card isComprar" idItem="${item.iditens}">
-            <div class="btn btn-subtrair isComprarBtn" idItem="${item.iditens}">-</div><span class="label-quantidade-produto" idItem="${item.iditens}">Comprar</span>
-            <div class="btn btn-adicionar isComprarBtn" idItem="${item.iditens}">+</div>
-          </div>
-        </div>
-      </div>`
-    }
+      if(objItensListaLocalStorage[item.iditens]){
+        classeIsComprar = '';
+        classeIsComprarBtn = '';
+        qtdeItem = Number(objItensListaLocalStorage[item.iditens].qtdeProduto);
+        palavraComprarOuQtde = Number(objItensListaLocalStorage[item.iditens].qtdeProduto);
+        createAndInsertItemDetailsCart(item.iditens, 'fromLocalStorage');
+        const valorUnitarioItem = Number(objItensListaLocalStorage[item.iditens].valorProduto.replace('R$','').replace(',','.'));
+        contadorItens('fromLocalStorage', valorUnitarioItem * qtdeItem, item.iditens, '', qtdeItem);
+      }
+      newCard.innerHTML = htmlToNewCard(item.iditens, item.imagem, classeMaisVendido, urlImgMaisVendido, item.nome, classActivValueOriginal, valorOriginal, valorFinal, objReturnFetch.maximoQtdParcelamento, item.descricao, classeContemFaixaEtaria, condicaoIdade, classeIsComprar, classeIsComprarBtn, palavraComprarOuQtde);
+      
       container.appendChild(newCard);
     })
   })
   const btnsComprar = document.querySelectorAll(`.btn-comprar-card`);
   addEventsInCard(btnsComprar);
+}
+
+function htmlToNewCard(idItem, urlImgCard, classeMaisVendido, urlImgMaisVendido, nomeItem, classeActivValueOriginal, valorOriginal, valorFinal, maximoParcelamento, descricaoItem, classeContemFaixaEtaria, condicaoIdade, classeIsComprar, classeIsComprarBtn, palavraComprarOuQtde){
+  return `<img src="${urlImgCard}" alt="" class="img-card">
+  <img class="${classeMaisVendido}" src="${urlImgMaisVendido}">
+    <div class="infos-card">
+      <div class="container-descricao-card">
+        <div class="container-nome-valor-produto-card">
+          <div class="nome-produto" idItem="${idItem}">${nomeItem}</div>
+          <div class="container-valor-produto">
+            <span class="${classeActivValueOriginal}">${valorOriginal}</span>
+            <div class="container-display-valor">
+              <span>R$</span>
+              <div class="valor-produto" idItem="${idItem}">${valorFinal}</div>
+            </div>
+          <div class="max-parcelamento">${`em até ${maximoParcelamento}x`}</div>
+        </div>
+      </div>
+      <div class="descricao-card">
+        <p>${descricaoItem}</p>
+      </div>
+    </div>
+    <div class="container-regras-card">
+      <div class="regra-card-${classeContemFaixaEtaria}">
+        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span class="regra-idade">${condicaoIdade}</span> 
+      </div>
+      <div class="regra-card-ativo"> 
+        <svg class="regra-condicao" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <span class="regra-condicao">Regras e condições</span>
+      </div> 
+    </div>
+    <div class="container-btn-card ${classeIsComprar}">
+      <div class="btn-comprar-card ${classeIsComprar}" idItem="${idItem}">
+        <div class="btn btn-subtrair ${classeIsComprarBtn}" idItem="${idItem}">-</div><span class="label-quantidade-produto" idItem="${idItem}">${palavraComprarOuQtde}</span>
+        <div class="btn btn-adicionar ${classeIsComprarBtn}" idItem="${idItem}">+</div>
+      </div>
+    </div>
+  </div>`
 }
 
 //Função para add evento de clique em todos botões de comprar dos cards
@@ -400,10 +401,8 @@ if (versao === 'twoButtons'){
   btnClicado.classList.remove('isComprar');
   btnAddCart.classList.remove('isComprarBtn');
   btnSubCart.classList.remove('isComprarBtn');
-  addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
 } else if (versao === 'original'){
   labelQtdeProdutos.innerText = 'Comprar';
-  localStorage.removeItem(idItem);
   btnClicado.classList.add('isComprar');
   btnAddCart.classList.add('isComprarBtn');
   btnSubCart.classList.add('isComprarBtn');
@@ -420,7 +419,6 @@ if(+labelQtdeProdutos.innerText === 1){
   transformButtonBuy(idItem, 'original')
 } else{
   +labelQtdeProdutos.innerText--
-  localStorage.setItem(idItem, returnCurrentElementCard('card', idItem).innerHTML);
 }
 }
 
@@ -429,7 +427,6 @@ const valorItem = returnCurrentElementCard('valor-produto', idItem).innerText.re
 contadorItens('+', Number(valorItem), idItem);
 const labelQtdeProdutos = returnCurrentElementCard('label-quantidade-produto', idItem);
 +labelQtdeProdutos.innerText++;
-addInLocalStorage(idItem, returnCurrentElementCard('card', idItem).innerHTML);
 }
 
 function returnCurrentElementCard(classe, idItem){
@@ -485,9 +482,4 @@ function createTabsAndContainerCards(arrayGroups){
   })
   createCard(containersCard);
 }
-
-function addInLocalStorage(idItem, elemento){
-  localStorage.setItem(idItem, elemento);
-}
-
 
