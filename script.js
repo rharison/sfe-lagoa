@@ -78,6 +78,7 @@ body.addEventListener('click',(event)=> {
 })
 
 divDetailsCarrinho.addEventListener('click', (event) =>{
+  
   if (returnStateDetailsCartIsOpen()){
     openOrClosedDetailsCart('close');
   } else {
