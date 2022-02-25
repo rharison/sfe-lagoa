@@ -85,8 +85,7 @@ divCarrinhoFull.addEventListener('click', () =>{
 })
 
 function returnStateDetailsCartIsOpen(){
-  const divContainerCarrinho = document.querySelector('.container-carrinho');
-  return divContainerCarrinho.classList.contains('aberto');
+  return document.querySelector('.container-carrinho').classList.contains('aberto');
 }
 
 function openOrClosedDetailsCart(openOrClosed){
