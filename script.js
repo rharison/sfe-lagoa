@@ -259,7 +259,6 @@ function addOrRemoveItemDetailsCart(addOrRemove, idItem){
 function createCard(containersCard){
   const objTratatdo = tratarObjeto(objReturnFetch);
   const objItensListaLocalStorage = JSON.parse(localStorage.getItem('itensLista'));
-  
   containersCard.forEach(container => {
     objTratatdo[container.getAttribute('idgroup')].forEach((item) =>{
       let newCard = document.createElement('div');
@@ -304,8 +303,8 @@ function createCard(containersCard){
       let classeIsComprar = 'isComprar';
       let classeIsComprarBtn = 'isComprarBtn';
       let palavraComprarOuQtde = 'Comprar'
-
-      if(objItensListaLocalStorage[item.iditens]){
+      if(objItensListaLocalStorage && objItensListaLocalStorage[item.iditens]){
+        console.log('oi')
         classeIsComprar = '';
         classeIsComprarBtn = '';
         qtdeItem = Number(objItensListaLocalStorage[item.iditens].qtdeProduto);
@@ -314,7 +313,26 @@ function createCard(containersCard){
         const valorUnitarioItem = Number(objItensListaLocalStorage[item.iditens].valorProduto.replace('R$','').replace(',','.'));
         contadorItens('fromLocalStorage', valorUnitarioItem * qtdeItem, item.iditens, '', qtdeItem);
       }
-      newCard.innerHTML = htmlToNewCard(item.iditens, item.imagem, classeMaisVendido, urlImgMaisVendido, item.nome, classActivValueOriginal, valorOriginal, valorFinal, objReturnFetch.maximoQtdParcelamento, item.descricao, classeContemFaixaEtaria, condicaoIdade, classeIsComprar, classeIsComprarBtn, palavraComprarOuQtde);
+
+      const objDadosCard = {
+        idItem: item.iditens,
+        urlImgCard: item.imagem,
+        classeMaisVendido: classeMaisVendido,
+        urlImgMaisVendido: urlImgMaisVendido,
+        nomeItem: item.nome,
+        classeActivValueOriginal: classActivValueOriginal,
+        valorOriginal: valorOriginal,
+        valorFinal: valorFinal,
+        maximoParcelamento: objReturnFetch.maximoQtdParcelamento,
+        descricaoItem: item.descricao,
+        classeContemFaixaEtaria: classeContemFaixaEtaria,
+        condicaoIdade: condicaoIdade,
+        classeIsComprar: classeIsComprar,
+        classeIsComprarBtn: classeIsComprarBtn,
+        palavraComprarOuQtde: palavraComprarOuQtde
+      }
+
+      newCard.innerHTML = htmlToNewCard(objDadosCard);
       
       container.appendChild(newCard);
     })
@@ -323,40 +341,40 @@ function createCard(containersCard){
   addEventsInCard(btnsComprar);
 }
 
-function htmlToNewCard(idItem, urlImgCard, classeMaisVendido, urlImgMaisVendido, nomeItem, classeActivValueOriginal, valorOriginal, valorFinal, maximoParcelamento, descricaoItem, classeContemFaixaEtaria, condicaoIdade, classeIsComprar, classeIsComprarBtn, palavraComprarOuQtde){
-  return `<img src="${urlImgCard}" alt="" class="img-card">
-  <img class="${classeMaisVendido}" src="${urlImgMaisVendido}">
+function htmlToNewCard(objDadosCard){
+  return `<img src="${objDadosCard.urlImgCard}" alt="" class="img-card">
+  <img class="${objDadosCard.classeMaisVendido}" src="${objDadosCard.urlImgMaisVendido}">
     <div class="infos-card">
       <div class="container-descricao-card">
         <div class="container-nome-valor-produto-card">
-          <div class="nome-produto" idItem="${idItem}">${nomeItem}</div>
+          <div class="nome-produto" idItem="${objDadosCard.idItem}">${objDadosCard.nomeItem}</div>
           <div class="container-valor-produto">
-            <span class="${classeActivValueOriginal}">${valorOriginal}</span>
+            <span class="${objDadosCard.classeActivValueOriginal}">${objDadosCard.valorOriginal}</span>
             <div class="container-display-valor">
               <span>R$</span>
-              <div class="valor-produto" idItem="${idItem}">${valorFinal}</div>
+              <div class="valor-produto" idItem="${objDadosCard.idItem}">${objDadosCard.valorFinal}</div>
             </div>
-          <div class="max-parcelamento">${`em até ${maximoParcelamento}x`}</div>
+          <div class="max-parcelamento">${`em até ${objDadosCard.maximoParcelamento}x`}</div>
         </div>
       </div>
       <div class="descricao-card">
-        <p>${descricaoItem}</p>
+        <p>${objDadosCard.descricaoItem}</p>
       </div>
     </div>
     <div class="container-regras-card">
-      <div class="regra-card-${classeContemFaixaEtaria}">
+      <div class="regra-card-${objDadosCard.classeContemFaixaEtaria}">
         <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        <span class="regra-idade">${condicaoIdade}</span> 
+        <span class="regra-idade">${objDadosCard.condicaoIdade}</span> 
       </div>
       <div class="regra-card-ativo"> 
         <svg class="regra-condicao" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="23px" width="20px" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span class="regra-condicao">Regras e condições</span>
       </div> 
     </div>
-    <div class="container-btn-card ${classeIsComprar}">
-      <div class="btn-comprar-card ${classeIsComprar}" idItem="${idItem}">
-        <div class="btn btn-subtrair ${classeIsComprarBtn}" idItem="${idItem}">-</div><span class="label-quantidade-produto" idItem="${idItem}">${palavraComprarOuQtde}</span>
-        <div class="btn btn-adicionar ${classeIsComprarBtn}" idItem="${idItem}">+</div>
+    <div class="container-btn-card ${objDadosCard.classeIsComprar}">
+      <div class="btn-comprar-card ${objDadosCard.classeIsComprar}" idItem="${objDadosCard.idItem}">
+        <div class="btn btn-subtrair ${objDadosCard.classeIsComprarBtn}" idItem="${objDadosCard.idItem}">-</div><span class="label-quantidade-produto" idItem="${objDadosCard.idItem}">${objDadosCard.palavraComprarOuQtde}</span>
+        <div class="btn btn-adicionar ${objDadosCard.classeIsComprarBtn}" idItem="${objDadosCard.idItem}">+</div>
       </div>
     </div>
   </div>`
